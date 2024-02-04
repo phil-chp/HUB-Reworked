@@ -1,13 +1,15 @@
 {
-    "compilerOptions": {
-      "outDir": "./dist",
-      "noImplicitAny": true,
-      "module": "es6",
-      "target": "es6",
-      "allowJs": true,
-      "moduleResolution": "node"
-    },
-    "include": [
-      "./src/**/*"
-    ]
-  }
+  "compilerOptions": {
+    "outDir": "./dist",
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "es6",
+    "allowJs": true,
+    "moduleResolution": "node",
+    "baseUrl": "src",
+    "paths": {
+      "@shared/*": ["shared/*"],
+    }
+  },
+  "include": ["./src/**/*"],
+}

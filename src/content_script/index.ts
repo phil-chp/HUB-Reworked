@@ -1,3 +1,3 @@
 window.addEventListener('load', () => {
-    alert('[XPCalc] Page loaded!');
+    console.log('[XPCalc] Page loaded!');
 });

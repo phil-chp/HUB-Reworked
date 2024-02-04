@@ -10,6 +10,8 @@
     "start": "webpack serve --open --mode=development"
   },
   "devDependencies": {
+    "@types/chrome": "^0.0.260",
+    "prettier": "^3.2.4",
     "ts-loader": "^9.5.1",
     "typescript": "^5.3.3",
     "webpack": "^5.90.1",
