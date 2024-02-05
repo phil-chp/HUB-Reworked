@@ -1,3 +1,6 @@
+import User from "./User";
+import RawHubActivity from "./RawHubActivity";
+
 type HubActivityType =
   | "Talk"
   | "Workshop"
@@ -13,15 +16,35 @@ abstract class HubActivity {
   xp: number = 0;
   to_come: boolean;
 
-  constructor(data: any) {
+  protected _events: any[];
+  protected _codeacti: string;
+  protected _end: string;
+  protected _userData: User;
+  protected _region: string;
+
+  constructor(data: RawHubActivity, userData?: User, region?: string) {
     this.title = data.title;
-    this._calculateParticipation(data.events);
-    this.xp = this._calculateXP();
-    this.to_come = this._determineIfToCome(data);
+    this._events = data.events;
+    this._codeacti = data.codeacti;
+    this._end = data.end;
+    this._userData = userData;
+    this._region = region;
   }
 
   // *----------------------------------------------------------------------* //
-  // *                                Private                               * //
+  // *                                Public                                * //
+  // *----------------------------------------------------------------------* //
+
+  /**
+   * Initialize the data for the activity
+   * @param data Activity data
+   * @param userData User data (user for Project/Experience, we require the user login and the year)
+   * @param region Region of the user (either the country or the city)
+   */
+  public abstract init(): Promise<boolean>;
+
+  // *----------------------------------------------------------------------* //
+  // *                               Protected                              * //
   // *----------------------------------------------------------------------* //
 
   /**

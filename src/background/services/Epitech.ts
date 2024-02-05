@@ -1,14 +1,15 @@
+import pLimit from "p-limit";
+
 import { epitech } from "./AsyncChromeAPI";
+import EpitechAPI from "@shared/services/EpitechAPI";
 import User from "@shared/types/User";
 import HubActivity from "@shared/types/HubActivity";
 import HubActivityFactory from "@shared/types/HubActivityFactory";
-import { RawHubActivity } from "@shared/types/RawHubActivity";
+import RawHubActivity from "@shared/types/RawHubActivity";
 
-const API_PATH = "https://intra.epitech.eu/";
-const API_SUFFIX = "/?format=json";
+const LIMIT = pLimit(2);
 
 export default class Epitech {
-  private userCookie: string;
   private userInfo: User;
 
   private hubActivities: HubActivity[];
@@ -22,7 +23,8 @@ export default class Epitech {
    * cookie and the user info necessary for later.
    */
   public async init(): Promise<void> {
-    this.userCookie = await this._fetchCookie();
+    const userCookie = await this._fetchCookie();
+    EpitechAPI.getInstance().setUserCookie(userCookie);
     this.userInfo = await this._fetchUserInfo();
   }
 
@@ -33,25 +35,15 @@ export default class Epitech {
     this.hubActivities = [];
 
     if (this.userInfo === undefined) {
-      throw new Error("User info not found. Please call `Epitech.init` first.");
+      throw new Error("User info not found. Please call `Epitech.init()` first.");
     }
+    // this.userInfo.year = "2022"; // FIXME: REMOVE
+    // this.userInfo.city = "NCE";  // FIXME: REMOVE
     const { year, country, city } = this.userInfo;
 
-    const city_response = await this._fetchData(`module/${year}/B-INN-000/${city}-0-1`);
-    // const country_response = await this._fetchData(`module/${year}/B-INN-000/${country}-0-1`);
-
-    if (city_response !== null) {
-      const activities: RawHubActivity[] = city_response.activities;
-
-      for (const activity of activities) {
-        this.hubActivities.push(HubActivityFactory.createActivity(activity.type_title, activity));
-      }
-    }
-
-    // if (country_response !== null) {
-    //   console.log(city_response);
-    // }
-    console.log(this.hubActivities);
+    await this._fetchHubRegionalActivities(year, city);
+    await this._fetchHubRegionalActivities(year, country);
+    console.log("Hub Activities: ", this.hubActivities);
   }
 
   // *----------------------------------------------------------------------* //
@@ -77,7 +69,7 @@ export default class Epitech {
    */
   private async _fetchUserInfo(): Promise<User> {
     // TODO: Ask client for this info in case they have stored it
-    const response = await this._fetchData("user");
+    const response = await EpitechAPI.getInstance().fetchData("user");
 
     if (response === null) {
       throw new Error("Failed to fetch user info");
@@ -108,7 +100,7 @@ export default class Epitech {
 
     for (const campus of euroCampuses) {
       // TODO Change these to "HEAD" requests
-      const response = await this._fetchData(`module/${year}/B-INN-000/${campus}-0-1`, false);
+      const response = await EpitechAPI.getInstance().fetchData(`module/${year}/B-INN-000/${campus}-0-1`, false);
       if (response !== null) {
         correctCampus = campus;
         break;
@@ -117,27 +109,27 @@ export default class Epitech {
     return correctCampus || "PAR";
   }
 
-  /**
-   * Fetch data from the Epitech API using the user cookie and a pre-defined URL
-   * @param url The path to fetch (don't include any trailling or leading slashes)\
-   * Example: for `https://intra.epitech.eu/user/?format=json` use `user`
-   * @param warn Cause `console.error` in case of error.
-   * @returns The fetched data or null if the fetch failed
-   */
-  private async _fetchData(url: string, warn = true): Promise<any> | null {
-    const response = await fetch(API_PATH + url + API_SUFFIX, {
-      headers: {
-        Cookie: `user=${this.userCookie}`,
-        Accept: "application/json",
-      },
+  private async _fetchHubRegionalActivities(year: string, region: string) {
+    const response = await EpitechAPI.getInstance().fetchData(`module/${year}/B-INN-000/${region}-0-1`);
+
+    if (response === null) return;
+    const activities: RawHubActivity[] = response.activites;
+
+    const activityPromises = activities.map((activity) => {
+      return LIMIT(async () => {
+        const hubActivity = HubActivityFactory.createActivity(activity.type_title, activity, this.userInfo, region);
+        if (hubActivity !== null) {
+          return (await hubActivity.init()) ? hubActivity : null;
+        }
+        return null;
+      });
     });
 
-    if (response.ok === false) {
-      if (warn == true) {
-        console.error("Error fetching data:", response.status, response.statusText);
-      }
-      return null;
-    }
-    return response.json();
+    await Promise.all(activityPromises).then((activities) => {
+      const validActivities = activities.filter(
+        (activity) => activity !== null && (activity.presences > 0 || activity.absences > 0)
+      );
+      this.hubActivities.push(...validActivities);
+    });
   }
 }
