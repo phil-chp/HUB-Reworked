@@ -1,3 +1,3 @@
 window.addEventListener('load', () => {
-    console.log('[XPCalc] Page loaded!');
+    console.log('[HUB Reworked] Page loaded!');
 });

@@ -1,5 +1,5 @@
 {
-  "name": "xpcalc",
+  "name": "hub-reworked",
   "version": "1.0.0",
   "description": "Simple XP calculator for your Epitech Hub activities.",
   "main": "index.js",

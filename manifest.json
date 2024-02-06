@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "XPCalc (Epitech)",
+    "name": "HUB Reworked",
     "version": "1.0",
-    "description": "Simple XP calculator for your Epitech Hub activities.",
+    "description": "The most advances HUB assistant for Epitech students (XP calculator + event finder)",
     "icons": {
       "16": "assets/icon16.png",
       "48": "assets/icon48.png",
