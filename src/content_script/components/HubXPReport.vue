@@ -1,24 +1,51 @@
 <template>
-  <div class="xp-report">
-    TOTOT
-    <slot></slot>
+  <div class="note">
+    <label>Hub</label>
+    <span class="value">
+      <strong>XP&nbsp;:&nbsp;{{ xp < 0 ? message : xp }}</strong>
+      <a class="aid"></a>
+    </span>
   </div>
 </template>
 
 <script setup lang="ts">
-import DataHubActivities from "../../shared/types/DataHubActivities";
-import Communication from "../services/Communication";
+import { ref } from "vue";
+import Communication from "@content_script/services/Communication";
+import DataHubActivities from "@shared/types/DataHubActivities";
+import HubActivity from "@shared/types/HubActivity";
 
-console.log('[HUB Reworked] HubXPReport mounted');
+const xp = ref(-1);
+const message = ref("Loading...");
+const fetchAttempts = ref(3);
+const needUserInput = ref([]);
+
 
 Communication.sendRequest("XP").then((res: DataHubActivities) => {
-  console.log("Received response: ", res);
+  if (res === undefined || res === null) fetchXP();
+  xp.value = calculateXP(res.activities);
+  console.log("Need User input: ", needUserInput.value);
 });
-</script>
 
-<style scoped>
-.xp-report {
-  margin: 10px;
-  font-size: inherit;
+
+const fetchXP = () => {
+  fetchAttempts.value--;
+  if (fetchAttempts.value > 0) {
+    xp.value = -1;
+    Communication.sendRequest("XP");
+  }
+  message.value = "Error.";
+  return;
 }
-</style>
+
+
+const calculateXP = (activities: HubActivity[]) => {
+  let xp = 0;
+  for (const activity of activities) {
+    if (activity.type === "Project" && activity.xp === 0) {
+      needUserInput.value.push(activity); // TODO: Add a way to display this to the user
+    }
+    xp += activity.xp;
+  }
+  return xp;
+};
+</script>

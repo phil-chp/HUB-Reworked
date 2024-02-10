@@ -14,14 +14,20 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.vue$/,
+        loader: "vue-loader",
+      },
+      {
         test: /\.ts$/,
         loader: "ts-loader",
-        exclude: /node_modules/,
         options: { appendTsSuffixTo: [/\.vue$/] },
       },
       {
-        test: /\.vue$/,
-        loader: "vue-loader",
+        test: /\.css$/,
+        use: [
+          'vue-style-loader',
+          'css-loader'
+        ]
       },
     ],
   },
@@ -30,6 +36,8 @@ module.exports = {
     extensions: [".ts", ".js", ".vue"],
     alias: {
       vue$: "vue/dist/vue.esm-bundler.js",
+      "@shared": path.resolve(__dirname, "src/shared/"),
+      "@content_script": path.resolve(__dirname, "src/content_script/"),
       "@shared": path.resolve(__dirname, "src/shared/"),
     },
   },
