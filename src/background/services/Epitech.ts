@@ -7,7 +7,7 @@ import HubActivity from "@shared/types/HubActivity";
 import HubActivityFactory from "@shared/types/HubActivityFactory";
 import RawHubActivity from "@shared/types/RawHubActivity";
 
-const LIMIT = pLimit(2);
+const LIMIT = pLimit(20);
 
 export default class Epitech {
   private userInfo: User;
@@ -23,15 +23,15 @@ export default class Epitech {
    * cookie and the user info necessary for later.
    */
   public async init(): Promise<void> {
-    const userCookie = await this._fetchCookie();
-    EpitechAPI.getInstance().setUserCookie(userCookie);
+    // const userCookie = await this._fetchCookie();
+    // EpitechAPI.getInstance().setUserCookie(userCookie);
     this.userInfo = await this._fetchUserInfo();
   }
 
   /**
    * Fetch the hub activities from the Epitech API
    */
-  public async fetchHubActivities(): Promise<void> {
+  public async fetchHubActivities(): Promise<HubActivity[]> {
     this.hubActivities = [];
 
     if (this.userInfo === undefined) {
@@ -44,6 +44,7 @@ export default class Epitech {
     await this._fetchHubRegionalActivities(year, city);
     await this._fetchHubRegionalActivities(year, country);
     console.log("Hub Activities: ", this.hubActivities);
+    return this.hubActivities;
   }
 
   // *----------------------------------------------------------------------* //

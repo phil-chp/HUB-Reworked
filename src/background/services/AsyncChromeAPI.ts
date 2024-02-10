@@ -34,16 +34,13 @@ export namespace epitech {
 
   export namespace runtime {
 
-  //   /**
-  //    * Send a message
-  //    * @param message
-  //    */
-  //   export function sendMessage(message: any): void {
-  //     chrome.runtime.sendMessage(message);
-
-
-
-
+    /**
+     * Send a message
+     * @param message
+     */
+    export function sendMessage(message: any, handler?: (response: any) => void): void {
+      chrome.runtime.sendMessage(message, handler);
+    }
   }
 
 }

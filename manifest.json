@@ -1,27 +1,31 @@
 {
-    "manifest_version": 3,
-    "name": "HUB Reworked",
-    "version": "1.0",
-    "description": "The most advances HUB assistant for Epitech students (XP calculator + event finder)",
-    "icons": {
-      "16": "assets/icon16.png",
-      "48": "assets/icon48.png",
-      "128": "assets/icon128.png"
-    },
-    "permissions": [
-      "cookies",
-      "storage"
-    ],
-    "host_permissions": [
-      "https://intra.epitech.eu/*"
-    ],
-    "background": {
-      "service_worker": "dist/background.js"
-    },
-    "content_scripts": [
-      {
-        "matches": ["https://intra.epitech.eu/user/*"],
-        "js": ["dist/content_script.js"]
-      }
-    ]
-  }
+  "manifest_version": 3,
+  "name": "HUB Reworked",
+  "version": "1.0",
+  "description": "The most advances HUB assistant for Epitech students (XP calculator + event finder)",
+  "icons": {
+    "16": "assets/icon16.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  },
+  "permissions": [
+    "cookies",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://intra.epitech.eu/*"
+  ],
+  "background": {
+    "service_worker": "dist/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://intra.epitech.eu/user/*"
+      ],
+      "js": [
+        "dist/content_script.js"
+      ]
+    }
+  ]
+}

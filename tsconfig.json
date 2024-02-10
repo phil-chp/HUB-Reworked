@@ -2,14 +2,18 @@
   "compilerOptions": {
     "outDir": "./dist",
     "noImplicitAny": true,
-    "module": "es6",
-    "target": "es6",
+    "module": "esnext",
+    "target": "esnext",
+    "jsx": "preserve",
     "allowJs": true,
     "moduleResolution": "node",
     "baseUrl": "src",
     "paths": {
+      "@background/*": ["background/*"],
+      "@content_script/*": ["content_script/*"],
       "@shared/*": ["shared/*"],
-    }
+    },
   },
-  "include": ["./src/**/*"],
+  "include": ["src/**/*.ts", "src/**/*.vue", "vue-shims.d.ts"],
+  "exclude": ["node_modules"],
 }

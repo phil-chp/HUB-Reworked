@@ -3,7 +3,7 @@ const API_SUFFIX = "/?format=json";
 
 export default class EpitechAPI {
   private static instance: EpitechAPI;
-  private userCookie: string;
+  // private userCookie: string;
 
   private constructor() {}
 
@@ -14,13 +14,13 @@ export default class EpitechAPI {
     return EpitechAPI.instance;
   }
 
-  /**
-   * Set the userCookie
-   * @param userCookie
-   */
-  public setUserCookie(userCookie: string) {
-    this.userCookie = userCookie;
-  }
+  // /**
+  //  * Set the userCookie
+  //  * @param userCookie
+  //  */
+  // public setUserCookie(userCookie: string) {
+  //   this.userCookie = userCookie;
+  // }
 
   /**
    * Fetch data from the Epitech API using the user cookie and a pre-defined URL
@@ -30,12 +30,12 @@ export default class EpitechAPI {
    * @returns The fetched data or null if the fetch failed
    */
   public async fetchData(url: string, warn = true): Promise<any> | null {
-    if (this.userCookie === undefined) {
-      throw new Error("User cookie not set. Please call `EpitechAPI.setUserCookie()` first.");
-    }
+    // if (this.userCookie === undefined) {
+    //   throw new Error("User cookie not set. Please call `EpitechAPI.setUserCookie()` first.");
+    // }
     const response = await fetch(API_PATH + url + API_SUFFIX, {
       headers: {
-        Cookie: `user=${this.userCookie}`,
+        // Cookie: `user=${this.userCookie}`, // TODO: Remove cookie feature
         Accept: "application/json",
       },
     });
