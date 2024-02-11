@@ -36,7 +36,7 @@ module.exports = {
     extensions: [".ts", ".js", ".vue"],
     alias: {
       vue$: "vue/dist/vue.esm-bundler.js",
-      "@shared": path.resolve(__dirname, "src/shared/"),
+      "@background": path.resolve(__dirname, "src/background/"),
       "@content_script": path.resolve(__dirname, "src/content_script/"),
       "@shared": path.resolve(__dirname, "src/shared/"),
     },

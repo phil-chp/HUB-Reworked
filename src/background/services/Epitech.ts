@@ -1,6 +1,5 @@
 import pLimit from "p-limit";
 
-import { epitech } from "./AsyncChromeAPI";
 import EpitechAPI from "@shared/services/EpitechAPI";
 import User from "@shared/types/User";
 import HubActivity from "@shared/types/HubActivity";
@@ -23,8 +22,6 @@ export default class Epitech {
    * cookie and the user info necessary for later.
    */
   public async init(): Promise<void> {
-    // const userCookie = await this._fetchCookie();
-    // EpitechAPI.getInstance().setUserCookie(userCookie);
     this.userInfo = await this._fetchUserInfo();
   }
 
@@ -50,19 +47,6 @@ export default class Epitech {
   // *----------------------------------------------------------------------* //
   // *                                Private                               * //
   // *----------------------------------------------------------------------* //
-
-  /**
-   * Fetch the user cookie from the Chrome API
-   * @returns The user cookie
-   */
-  private async _fetchCookie(): Promise<string> {
-    const cookie = await epitech.cookies.get("user");
-
-    if (cookie === null) {
-      throw new Error("Cookie 'user' not found");
-    }
-    return cookie.value;
-  }
 
   /**
    * Fetch and determine the user info from the Epitech API

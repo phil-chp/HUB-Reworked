@@ -1,18 +1,20 @@
 import DataHubActivities from "@shared/types/DataHubActivities";
-class Communication {
-  private _socket: chrome.runtime.Port;
 
-  constructor() {
-    this._socket = chrome.runtime.connect();
-  }
-
+class Client {
   // *----------------------------------------------------------------------* //
   // *                                Public                                * //
   // *----------------------------------------------------------------------* //
 
-  public sendRequest(op: "XP"): Promise<DataHubActivities>;
+  public static getInstance(): Client {
+    if (Client._instance === undefined) {
+      Client._instance = new Client();
+    }
+    return Client._instance;
+  }
 
-  public sendRequest(op: string, d: any = null): Promise<any> {
+  public send(op: "XP"): Promise<DataHubActivities>;
+
+  public send(op: string, d: any = null): Promise<any> {
     return new Promise((resolve) => {
       const seq = Date.now();
       const hook = (data: any) => {
@@ -23,7 +25,6 @@ class Communication {
       };
 
       this._socket.onMessage.addListener(hook);
-
       return this._socket.postMessage({ op, seq, d });
     });
   }
@@ -31,6 +32,13 @@ class Communication {
   // *----------------------------------------------------------------------* //
   // *                                Private                               * //
   // *----------------------------------------------------------------------* //
+
+  private static _instance: Client;
+  private _socket: chrome.runtime.Port;
+
+  private constructor() {
+    this._socket = chrome.runtime.connect();
+  }
 }
 
-export default new Communication();
+export default Client;
