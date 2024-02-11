@@ -1,5 +1,5 @@
-import User from "./User";
-import RawHubActivity from "./RawHubActivity";
+import User from "@shared/types/User";
+import RawHubActivity from "@shared/types/RawHubActivity";
 
 type HubActivityType =
   | "Talk"

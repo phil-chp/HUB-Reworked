@@ -1,5 +1,5 @@
-import HubActivity from "../HubActivity";
-import RawHubActivity from "../RawHubActivity";
+import HubActivity from "@shared/types/HubActivity";
+import RawHubActivity from "@shared/types/RawHubActivity";
 
 export default class HubTalk extends HubActivity {
   type: "Talk" = "Talk";

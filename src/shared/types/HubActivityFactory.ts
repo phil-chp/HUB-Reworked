@@ -1,13 +1,13 @@
-import User from "./User";
-import HubActivity from "./HubActivity";
-import RawHubActivity from "./RawHubActivity";
+import User from "@shared/types/User";
+import HubActivity from "@shared/types/HubActivity";
+import RawHubActivity from "@shared/types/RawHubActivity";
 import {
   HubTalk,
   HubWorkshop,
   HubHackathon,
   HubExperience,
   HubProject,
-} from "./hubActivities";
+} from "@shared/types/hubActivities";
 
 export default class HubActivityFactory {
   static createActivity(type: string, data: RawHubActivity, userData: User = null, region: string = null): HubActivity | null {

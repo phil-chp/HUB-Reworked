@@ -3,8 +3,6 @@
     <label>Hub</label>
     <span class="value">
       <strong>XP&nbsp;:&nbsp;{{ xp < 0 ? message : xp }}</strong>
-      {{ fetchAttempts }}
-      <a class="aid"></a>
     </span>
   </div>
 </template>

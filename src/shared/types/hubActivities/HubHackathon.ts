@@ -1,6 +1,5 @@
-import HubActivity from "../HubActivity";
-import RawHubActivity from "../RawHubActivity";
-import User from "../User";
+import HubActivity from "@shared/types/HubActivity";
+import RawHubActivity from "@shared/types/RawHubActivity";
 
 export default class HubHackathon extends HubActivity {
   type: "Hackathon" = "Hackathon";

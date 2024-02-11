@@ -1,4 +1,5 @@
 import DataHubActivities from "@shared/types/DataHubActivities";
+import HubActivity from "@shared/types/HubActivity";
 
 class Client {
   // *----------------------------------------------------------------------* //
@@ -11,6 +12,8 @@ class Client {
     }
     return Client._instance;
   }
+
+  public send(op: "TOTO"): Promise<HubActivity[]>;
 
   public send(op: "XP"): Promise<DataHubActivities>;
 

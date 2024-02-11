@@ -9,9 +9,16 @@ import RawHubActivity from "@shared/types/RawHubActivity";
 const LIMIT = pLimit(20);
 
 export default class Epitech {
-  private userInfo: User;
+  private _LS: chrome.storage.LocalStorageArea;
 
-  private hubActivities: HubActivity[];
+  private _userInfo: User;
+  private _hubActivities: HubActivity[];
+
+  constructor() {
+    this._LS = chrome.storage.local;
+    // this._LS.clear();
+    this._hubActivities = [];
+  }
 
   // *----------------------------------------------------------------------* //
   // *                               Public                                 * //
@@ -22,26 +29,42 @@ export default class Epitech {
    * cookie and the user info necessary for later.
    */
   public async init(): Promise<void> {
-    this.userInfo = await this._fetchUserInfo();
+    this._userInfo = await this._fetchUserInfo();
   }
 
   /**
    * Fetch the hub activities from the Epitech API
    */
   public async fetchHubActivities(): Promise<HubActivity[]> {
-    this.hubActivities = [];
-
-    if (this.userInfo === undefined) {
+    if (this._userInfo === undefined) {
       throw new Error("User info not found. Please call `Epitech.init()` first.");
     }
-    // this.userInfo.year = "2022"; // FIXME: REMOVE
-    // this.userInfo.city = "NCE";  // FIXME: REMOVE
-    const { year, country, city } = this.userInfo;
+    if (this._hubActivities.length > 0) {
+      return this._hubActivities;
+    }
+    const data = await new Promise((resolve, reject) => {
+      this._LS.get("hubActivities", (res) => {
+        if (res.hubActivities !== undefined) {
+          resolve(res.hubActivities);
+        }
+        resolve(undefined);
+      });
+    }).catch(() => undefined);
+
+    if (data !== undefined) {
+      this._hubActivities = data as HubActivity[];
+      return this._hubActivities;
+    }
+
+    // this._userInfo.year = "2022"; // FIXME: REMOVE
+    // this._userInfo.city = "NCE";  // FIXME: REMOVE
+    const { year, country, city } = this._userInfo;
 
     await this._fetchHubRegionalActivities(year, city);
     await this._fetchHubRegionalActivities(year, country);
-    console.log("Hub Activities: ", this.hubActivities);
-    return this.hubActivities;
+    this._LS.remove("hubActivities");
+    this._LS.set({ hubActivities: this._hubActivities });
+    return this._hubActivities;
   }
 
   // *----------------------------------------------------------------------* //
@@ -98,11 +121,11 @@ export default class Epitech {
     const response = await EpitechAPI.getInstance().fetchData(`module/${year}/B-INN-000/${region}-0-1`);
 
     if (response === null) return;
-    const activities: RawHubActivity[] = response.activites;
+    const activities: RawHubActivity[] = response.activites; //.slice(200, 500);
 
     const activityPromises = activities.map((activity) => {
       return LIMIT(async () => {
-        const hubActivity = HubActivityFactory.createActivity(activity.type_title, activity, this.userInfo, region);
+        const hubActivity = HubActivityFactory.createActivity(activity.type_title, activity, this._userInfo, region);
         if (hubActivity !== null) {
           return (await hubActivity.init()) ? hubActivity : null;
         }
@@ -114,7 +137,7 @@ export default class Epitech {
       const validActivities = activities.filter(
         (activity) => activity !== null && (activity.presences > 0 || activity.absences > 0)
       );
-      this.hubActivities.push(...validActivities);
+      this._hubActivities.push(...validActivities);
     });
   }
 }
