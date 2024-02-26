@@ -43,6 +43,10 @@ export default class IntraAPI {
     });
   }
 
+  public setUserCookie(cookie: string) {
+    this._userCookie = cookie;
+  }
+
   /**
    * Fetch data from the Epitech API using the user cookie and a pre-defined URL
    * @param url The path to fetch (don't include any trailling or leading slashes)\
