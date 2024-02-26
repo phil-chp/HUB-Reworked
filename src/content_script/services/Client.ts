@@ -24,6 +24,8 @@ class Client {
     return Client._instance;
   }
 
+  public send(op: "TEST_OP"): Promise<string>;
+
   public send(op: "EVENTS"): Promise<HUBEvents>;
 
   public send(op: "XP"): Promise<DataHubActivities>;

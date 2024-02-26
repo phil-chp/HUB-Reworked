@@ -47,6 +47,9 @@ class Server {
       }
 
       switch (data.op) {
+        // case "TEST_OP":
+        //   return respond("some data");
+
         case "XP":
           const activities = await this._epi.fetchHubActivities();
           const response: DataHubActivities = {

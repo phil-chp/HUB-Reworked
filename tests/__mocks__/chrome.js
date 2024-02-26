@@ -23,24 +23,44 @@ const storageMock = (() => {
 
 //* ------------------------------------------------------------------------ *//
 //* Mock for chrome.runtime.Port
-const mockPorts = [];
+let connectedPair;
+
 class MockPort {
-  constructor() {
+  constructor(counterpart = null) {
+    this.counterpart = counterpart;
     this.onMessage = {
       addListener: jest.fn((listener) => {
         this.messageListener = listener;
       }),
-      removeListener: jest.fn((listener) => {
-        if (this.messageListener === listener) {
-          this.messageListener = null;
-        }
+      removeListener: jest.fn(() => {
+        this.messageListener = null;
       }),
     };
     this.postMessage = jest.fn((message) => {
-      this.messageListener?.(message);
+      setTimeout(() => {
+        this.counterpart?.messageListener?.(message);
+      }, 0);
     });
   }
 }
+// const mockPorts = [];
+// class MockPort {
+//   constructor() {
+//     this.onMessage = {
+//       addListener: jest.fn((listener) => {
+//         this.messageListener = listener;
+//       }),
+//       removeListener: jest.fn((listener) => {
+//         if (this.messageListener === listener) {
+//           this.messageListener = null;
+//         }
+//       }),
+//     };
+//     this.postMessage = jest.fn((message) => {
+//       this.messageListener?.(message);
+//     });
+//   }
+// }
 
 //* ------------------------------------------------------------------------ *//
 //* Mock for chrome.cookies.Cookie
@@ -62,17 +82,46 @@ const cookiesMock = {
 const runtimeMock = {
   onConnect: {
     addListener: jest.fn((listener) => {
-      const mockPort = new MockPort();
-      mockPorts.push(mockPort);
-      listener(mockPort);
+      if (connectedPair) {
+        listener(connectedPair.serverPort);
+      } else {
+        connectedPair = {
+          clientPort: new MockPort(),
+          serverPort: new MockPort(),
+        };
+        connectedPair.clientPort.counterpart = connectedPair.serverPort;
+        connectedPair.serverPort.counterpart = connectedPair.clientPort;
+      }
     }),
   },
   connect: jest.fn(() => {
-    const mockPort = new MockPort();
-    mockPorts.push(mockPort);
-    return mockPort;
+    if (connectedPair) {
+      return connectedPair.clientPort;
+    } else {
+      connectedPair = {
+        clientPort: new MockPort(),
+        serverPort: new MockPort(),
+      };
+      connectedPair.clientPort.counterpart = connectedPair.serverPort;
+      connectedPair.serverPort.counterpart = connectedPair.clientPort;
+      return connectedPair.clientPort;
+    }
   }),
 };
+// const runtimeMock = {
+//   onConnect: {
+//     addListener: jest.fn((listener) => {
+//       const mockPort = new MockPort();
+//       mockPorts.push(mockPort);
+//       listener(mockPort);
+//     }),
+//   },
+//   connect: jest.fn(() => {
+//     const mockPort = new MockPort();
+//     mockPorts.push(mockPort);
+//     return mockPort;
+//   }),
+// };
 
 //* ------------------------------------------------------------------------ *//
 //* Mock for chrome
