@@ -1,4 +1,5 @@
 import { HUBEvent } from "@shared/types/HUBEvents";
+import { campusData } from "./campusData";
 
 export type StudentCampus = {
   cityId: string;
@@ -29,18 +30,13 @@ abstract class Scrapper {
   // *----------------------------------------------------------------------* //
 
   public async init() {
-    const pathToCampusData = chrome.runtime.getURL("src/background/scrapper/res/campusData.json");
-    this._studentCampus = await fetch(pathToCampusData)
-      .then(async (response) => response.json())
-      .then((campusData) => {
-        return campusData.campuses.find((record: StudentCampus) => {
-          return record.cityId === this._city && record.countryId === this._country;
-        });
-      });
+    this._studentCampus = campusData.find((record: StudentCampus) => {
+      return record.cityId === this._city;
+    });
+
     if (this._studentCampus === undefined) {
       throw new Error("Campus not found");
     }
-    console.log(this._studentCampus);
   }
 
   // *----------------------------------------------------------------------* //

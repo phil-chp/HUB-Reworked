@@ -17,14 +17,13 @@ const storageMock = (() => {
     remove: jest.fn((key, callback) => {
       delete storage[key];
       if (callback) callback();
-    })
+    }),
   };
 })();
 
-
-
 //* ------------------------------------------------------------------------ *//
 //* Mock for chrome.runtime.Port
+const mockPorts = [];
 class MockPort {
   constructor() {
     this.onMessage = {
@@ -43,7 +42,23 @@ class MockPort {
   }
 }
 
-const mockPorts = [];
+//* ------------------------------------------------------------------------ *//
+//* Mock for chrome.cookies.Cookie
+require("dotenv").config();
+const cookiesMock = {
+  get: jest.fn((details, callback) => {
+    const cookieName = details.name;
+    const cookieValue = process.env["USER_COOKIE"];
+    if (cookieValue) {
+      callback({ name: cookieName, value: cookieValue });
+    } else {
+      callback(null);
+    }
+  }),
+};
+
+//* ------------------------------------------------------------------------ *//
+//* Mock for chrome.runtime
 const runtimeMock = {
   onConnect: {
     addListener: jest.fn((listener) => {
@@ -56,22 +71,6 @@ const runtimeMock = {
     const mockPort = new MockPort();
     mockPorts.push(mockPort);
     return mockPort;
-  }),
-  // Mock any other necessary chrome.runtime properties or methods here
-};
-
-//* ------------------------------------------------------------------------ *//
-//* Mock for chrome.cookies.Cookie
-require('dotenv').config();
-const cookiesMock = {
-  get: jest.fn((details, callback) => {
-    const cookieName = details.name;
-    const cookieValue = process.env["USER_COOKIE"];
-    if (cookieValue) {
-      callback({ name: cookieName, value: cookieValue });
-    } else {
-      callback(null);
-    }
   }),
 };
 

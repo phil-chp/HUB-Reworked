@@ -20,7 +20,6 @@ export default class Epitech {
     this._LS = chrome.storage.local;
     // this._LS.clear();
     this._hubActivities = [];
-    this._scrapperMeetup = new ScrapperMeetup("BRU", "BE");
   }
 
   // *----------------------------------------------------------------------* //
@@ -33,6 +32,7 @@ export default class Epitech {
    */
   public async init(): Promise<void> {
     this._userInfo = await this._fetchUserInfo();
+    this._scrapperMeetup = new ScrapperMeetup(this._userInfo.city, this._userInfo.country);
     this._scrapperMeetup.init();
   }
 
