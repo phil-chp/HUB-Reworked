@@ -1,7 +1,20 @@
 import DataHubActivities from "@shared/types/DataHubActivities";
 import Epitech from "@background/services/Epitech";
+import HUBEvents from "@shared/types/HUBEvents";
 
 class Server {
+  // *----------------------------------------------------------------------* //
+  // *                                Private                               * //
+  // *----------------------------------------------------------------------* //
+
+  private static _instance: Server;
+  private _epi: Epitech;
+
+  private constructor(epi: Epitech) {
+    this._epi = epi;
+    this._openConnection();
+  }
+
   // *----------------------------------------------------------------------* //
   // *                                Public                                * //
   // *----------------------------------------------------------------------* //
@@ -16,14 +29,6 @@ class Server {
   // *----------------------------------------------------------------------* //
   // *                                Private                               * //
   // *----------------------------------------------------------------------* //
-
-  private static _instance: Server;
-  private _epi: Epitech;
-
-  private constructor(epi: Epitech) {
-    this._epi = epi;
-    this._openConnection();
-  }
 
   private _openConnection() {
     chrome.runtime.onConnect.addListener((socket: chrome.runtime.Port) => {
@@ -50,6 +55,15 @@ class Server {
           };
 
           return respond(response);
+
+        case "EVENTS":
+          const events = await this._epi.scrapeEvents(20);
+          const response2: HUBEvents = {
+            d: Date.now(),
+            events,
+          };
+
+          return respond(response2);
       }
 
     });

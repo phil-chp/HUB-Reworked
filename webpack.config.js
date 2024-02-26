@@ -1,5 +1,6 @@
 const path = require("path");
 const { VueLoaderPlugin } = require("vue-loader");
+const webpack = require("webpack");
 
 module.exports = {
   mode: "development", // TODO: 'production'
@@ -24,14 +25,21 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [
-          'vue-style-loader',
-          'css-loader'
-        ]
+        use: ["vue-style-loader", "css-loader"],
       },
     ],
   },
-  plugins: [new VueLoaderPlugin()],
+  plugins: [
+    new VueLoaderPlugin(),
+    new webpack.DefinePlugin({
+      // Enable the Options API
+      __VUE_OPTIONS_API__: JSON.stringify(true),
+      // Disable Vue devtools in production
+      __VUE_PROD_DEVTOOLS__: JSON.stringify(false),
+      // Disable detailed hydration mismatch warnings in production
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false),
+    }),
+  ],
   resolve: {
     extensions: [".ts", ".js", ".vue"],
     alias: {

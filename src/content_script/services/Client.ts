@@ -1,7 +1,18 @@
 import DataHubActivities from "@shared/types/DataHubActivities";
-import HubActivity from "@shared/types/HubActivity";
+import HUBEvents from "@shared/types/HUBEvents";
 
 class Client {
+  // *----------------------------------------------------------------------* //
+  // *                                Private                               * //
+  // *----------------------------------------------------------------------* //
+
+  private static _instance: Client;
+  private _socket: chrome.runtime.Port;
+
+  private constructor() {
+    this._socket = chrome.runtime.connect();
+  }
+
   // *----------------------------------------------------------------------* //
   // *                                Public                                * //
   // *----------------------------------------------------------------------* //
@@ -13,7 +24,7 @@ class Client {
     return Client._instance;
   }
 
-  public send(op: "TOTO"): Promise<HubActivity[]>;
+  public send(op: "EVENTS"): Promise<HUBEvents>;
 
   public send(op: "XP"): Promise<DataHubActivities>;
 
@@ -30,17 +41,6 @@ class Client {
       this._socket.onMessage.addListener(hook);
       return this._socket.postMessage({ op, seq, d });
     });
-  }
-
-  // *----------------------------------------------------------------------* //
-  // *                                Private                               * //
-  // *----------------------------------------------------------------------* //
-
-  private static _instance: Client;
-  private _socket: chrome.runtime.Port;
-
-  private constructor() {
-    this._socket = chrome.runtime.connect();
   }
 }
 

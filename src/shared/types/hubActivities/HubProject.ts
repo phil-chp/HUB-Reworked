@@ -1,4 +1,4 @@
-import EpitechAPI from "@shared/services/EpitechAPI";
+import IntraAPI from "@shared/services/IntraAPI";
 import User from "@shared/types/User";
 import HubActivity from "@shared/types/HubActivity";
 import RawHubActivity from "@shared/types/RawHubActivity";
@@ -39,7 +39,7 @@ export default class HubProject extends HubActivity {
   }
 
   private async _calcAttendance(codeacti: string, login: string, year: string, region: string): Promise<boolean> {
-    const grades: HubActivityGrade[] = await EpitechAPI.getInstance().fetchData(
+    const grades: HubActivityGrade[] = await IntraAPI.getInstance().fetch(
       `module/${year}/B-INN-000/${region}-0-1/${codeacti}/note`
     );
     if (!Array.isArray(grades) || grades.length === 0) return false;
@@ -59,7 +59,7 @@ export default class HubProject extends HubActivity {
   }
 
   private async _calcMemberCount(codeacti: string, login: string, year: string, region: string): Promise<boolean> {
-    const project: RawHubProject = await EpitechAPI.getInstance().fetchData(
+    const project: RawHubProject = await IntraAPI.getInstance().fetch(
       `module/${year}/B-INN-000/${region}-0-1/${codeacti}/project`
     );
     if (project === undefined || project === null) return false;

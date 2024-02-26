@@ -13,7 +13,9 @@
     "storage"
   ],
   "host_permissions": [
-    "https://intra.epitech.eu/*"
+    "https://intra.epitech.eu/*",
+    "https://www.meetup.com/*",
+    "https://www.eventbrite.be/*"
   ],
   "background": {
     "service_worker": "dist/background.js"
@@ -26,6 +28,14 @@
       "js": [
         "dist/content_script.js"
       ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/background/scrapper/res/campusData.json"
+      ],
+      "matches": ["<all_urls>"]
     }
   ]
 }

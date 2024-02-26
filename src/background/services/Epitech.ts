@@ -1,10 +1,11 @@
 import pLimit from "p-limit";
 
-import EpitechAPI from "@shared/services/EpitechAPI";
+import IntraAPI from "@shared/services/IntraAPI";
 import User from "@shared/types/User";
 import HubActivity from "@shared/types/HubActivity";
 import HubActivityFactory from "@shared/types/HubActivityFactory";
 import RawHubActivity from "@shared/types/RawHubActivity";
+import ScrapperMeetup from "@background/scrapper/ScrapperMeetup";
 
 const LIMIT = pLimit(20);
 
@@ -12,12 +13,14 @@ export default class Epitech {
   private _LS: chrome.storage.LocalStorageArea;
 
   private _userInfo: User;
+  private _scrapperMeetup: ScrapperMeetup;
   private _hubActivities: HubActivity[];
 
   constructor() {
     this._LS = chrome.storage.local;
     // this._LS.clear();
     this._hubActivities = [];
+    this._scrapperMeetup = new ScrapperMeetup("BRU", "BE");
   }
 
   // *----------------------------------------------------------------------* //
@@ -30,6 +33,19 @@ export default class Epitech {
    */
   public async init(): Promise<void> {
     this._userInfo = await this._fetchUserInfo();
+    this._scrapperMeetup.init();
+  }
+
+  /**
+   * Get the user info
+   * @returns The user info
+   */
+  public getUserInfo(): User {
+    return this._userInfo;
+  }
+
+  public scrapeEvents(n: number) {
+    return this._scrapperMeetup.getLatestEvents(n);
   }
 
   /**
@@ -42,7 +58,7 @@ export default class Epitech {
     if (this._hubActivities.length > 0) {
       return this._hubActivities;
     }
-    const data = await new Promise((resolve, reject) => {
+    const data = await new Promise((resolve) => {
       this._LS.get("hubActivities", (res) => {
         if (res.hubActivities !== undefined) {
           resolve(res.hubActivities);
@@ -76,12 +92,8 @@ export default class Epitech {
    * @returns The user info
    */
   private async _fetchUserInfo(): Promise<User> {
-    // TODO: Ask client for this info in case they have stored it
-    const response = await EpitechAPI.getInstance().fetchData("user");
-
-    if (response === null) {
-      throw new Error("Failed to fetch user info");
-    }
+    const response = await IntraAPI.getInstance().fetch("user");
+    if (response === null) throw new Error("Failed to fetch user info");
 
     let [country, city] = response.location.split("/");
     if (response.semester >= 7 && city === "PAR") {
@@ -108,7 +120,7 @@ export default class Epitech {
 
     for (const campus of euroCampuses) {
       // TODO Change these to "HEAD" requests
-      const response = await EpitechAPI.getInstance().fetchData(`module/${year}/B-INN-000/${campus}-0-1`, false);
+      const response = await IntraAPI.getInstance().fetch(`module/${year}/B-INN-000/${campus}-0-1`, false);
       if (response !== null) {
         correctCampus = campus;
         break;
@@ -118,7 +130,7 @@ export default class Epitech {
   }
 
   private async _fetchHubRegionalActivities(year: string, region: string) {
-    const response = await EpitechAPI.getInstance().fetchData(`module/${year}/B-INN-000/${region}-0-1`);
+    const response = await IntraAPI.getInstance().fetch(`module/${year}/B-INN-000/${region}-0-1`);
 
     if (response === null) return;
     const activities: RawHubActivity[] = response.activites; //.slice(200, 500);
