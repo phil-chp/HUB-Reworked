@@ -39,6 +39,10 @@ abstract class Scrapper {
     }
   }
 
+  public getStudentCampus(): StudentCampus {
+    return this._studentCampus;
+  }
+
   // *----------------------------------------------------------------------* //
   // *                                Private                               * //
   // *----------------------------------------------------------------------* //
