@@ -7,8 +7,6 @@ import RawHubProject from "@shared/types/RawHubProject";
 
 export default class HubProject extends HubActivity {
   type: "Project" = "Project";
-  members: number;
-  grade: number;
 
   constructor(data: RawHubActivity, userData: User = null, region: string = null) {
     super(data, userData, region);
@@ -20,8 +18,8 @@ export default class HubProject extends HubActivity {
 
   public override async init(): Promise<boolean> {
     if (
-      (await this._calcAttendance(this._codeacti, this._userData.login, this._userData.year, this._region)) === false ||
-      (await this._calcMemberCount(this._codeacti, this._userData.login, this._userData.year, this._region)) === false
+      (await this._calcAttendance(this._userData.login, this._userData.year, this._region)) === false ||
+      (await this._calcMemberCount(this._userData.login, this._userData.year, this._region)) === false
     ) {
       return new Promise((resolve) => resolve(false));
     }
@@ -38,9 +36,9 @@ export default class HubProject extends HubActivity {
     return 0; // Handled separately.
   }
 
-  private async _calcAttendance(codeacti: string, login: string, year: string, region: string): Promise<boolean> {
+  private async _calcAttendance(login: string, year: string, region: string): Promise<boolean> {
     const grades: HubActivityGrade[] = await IntraAPI.getInstance().fetch(
-      `module/${year}/B-INN-000/${region}-0-1/${codeacti}/note`
+      `module/${year}/B-INN-000/${region}-0-1/${this.codeacti}/note`
     );
     if (!Array.isArray(grades) || grades.length === 0) return false;
     const userGrade = grades.find((grade) => grade.login === login);
@@ -58,9 +56,9 @@ export default class HubProject extends HubActivity {
     return true;
   }
 
-  private async _calcMemberCount(codeacti: string, login: string, year: string, region: string): Promise<boolean> {
+  private async _calcMemberCount(login: string, year: string, region: string): Promise<boolean> {
     const project: RawHubProject = await IntraAPI.getInstance().fetch(
-      `module/${year}/B-INN-000/${region}-0-1/${codeacti}/project`
+      `module/${year}/B-INN-000/${region}-0-1/${this.codeacti}/project`
     );
     if (project === undefined || project === null) return false;
 

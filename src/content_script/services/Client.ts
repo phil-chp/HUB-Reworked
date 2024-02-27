@@ -1,5 +1,6 @@
 import DataHubActivities from "@shared/types/DataHubActivities";
 import HUBEvents from "@shared/types/HUBEvents";
+import HubActivity from "@shared/types/HubActivity";
 
 class Client {
   // *----------------------------------------------------------------------* //
@@ -28,7 +29,9 @@ class Client {
 
   public send(op: "EVENTS"): Promise<HUBEvents>;
 
-  public send(op: "XP"): Promise<DataHubActivities>;
+  public send(op: "GET_XP"): Promise<DataHubActivities>;
+
+  public send(op: "UPDATE_XP", d: HubActivity[]): Promise<void>;
 
   public send(op: string, d: any = null): Promise<any> {
     return new Promise((resolve) => {

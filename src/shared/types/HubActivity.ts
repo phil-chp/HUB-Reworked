@@ -14,18 +14,20 @@ abstract class HubActivity {
   presences: number = 0;
   absences: number = 0;
   xp: number = 0;
+  codeacti: string;
   to_come: boolean;
+  grade: number; // Used for Project and Experience
+  members: number; // Used for Project
 
   protected _events: any[];
-  protected _codeacti: string;
-  protected _end: string;
+  protected _end: string; // TODO: Pass to public?
   protected _userData: User;
   protected _region: string;
 
   constructor(data: RawHubActivity, userData?: User, region?: string) {
     this.title = data.title;
     this._events = data.events;
-    this._codeacti = data.codeacti;
+    this.codeacti = data.codeacti;
     this._end = data.end;
     this._userData = userData;
     this._region = region;

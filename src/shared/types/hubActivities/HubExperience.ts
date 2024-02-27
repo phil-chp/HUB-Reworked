@@ -6,7 +6,6 @@ import HubActivityGrade from "@shared/types/HubActivityGrade";
 
 export default class HubExperience extends HubActivity {
   type: "Experience" = "Experience";
-  grade: number;
 
   constructor(data: RawHubActivity, userData: User = null, region: string = null) {
     super(data, userData, region);
@@ -18,7 +17,7 @@ export default class HubExperience extends HubActivity {
 
   public override async init(): Promise<boolean> {
     if (
-      (await this._verifyPresence(this._codeacti, this._userData.login, this._userData.year, this._region)) === false
+      (await this._verifyPresence(this._userData.login, this._userData.year, this._region)) === false
     ) {
       return new Promise((resolve) => resolve(false));
     }
@@ -35,9 +34,9 @@ export default class HubExperience extends HubActivity {
     return this.presences * 3;
   }
 
-  private async _verifyPresence(codeacti: string, login: string, year: string, region: string): Promise<boolean> {
+  private async _verifyPresence(login: string, year: string, region: string): Promise<boolean> {
     const grades: HubActivityGrade[] = await IntraAPI.getInstance().fetch(
-      `module/${year}/B-INN-000/${region}-0-1/${codeacti}/note`
+      `module/${year}/B-INN-000/${region}-0-1/${this.codeacti}/note`
     );
     if (!Array.isArray(grades) || grades.length === 0) return false;
     const userGrade = grades.find((grade) => grade.login === login);

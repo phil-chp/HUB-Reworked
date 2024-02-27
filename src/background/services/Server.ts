@@ -1,6 +1,7 @@
 import DataHubActivities from "@shared/types/DataHubActivities";
 import Epitech from "@background/services/Epitech";
 import HUBEvents from "@shared/types/HUBEvents";
+import DataEmptyReply from "@shared/types/DataEmptyReply";
 
 class Server {
   // *----------------------------------------------------------------------* //
@@ -40,7 +41,6 @@ class Server {
 
   private _handleMessage(socket: chrome.runtime.Port) {
     socket.onMessage.addListener(async (data: any) => {
-
       function respond(payload: any) {
         socket.postMessage({
           seq: data.seq,
@@ -52,25 +52,26 @@ class Server {
         case "TEST":
           return respond(null);
 
-        case "XP":
+        case "GET_XP":
           const activities = await this._epi.fetchHubActivities();
-          const response: DataHubActivities = {
+          return respond({
             d: Date.now(),
             activities,
-          };
+          } as DataHubActivities);
 
-          return respond(response);
+        case "UPDATE_XP":
+          this._epi.updateHubActivities(data.d);
+          return respond({
+            d: Date.now(),
+          } as DataEmptyReply);
 
         case "EVENTS":
           const events = await this._epi.scrapeEvents(20);
-          const response2: HUBEvents = {
+          return respond({
             d: Date.now(),
             events,
-          };
-
-          return respond(response2);
+          } as HUBEvents); // TODO: Rename HUBEvents to DataHUBEvents for consistency or vice-versa
       }
-
     });
   }
 }
