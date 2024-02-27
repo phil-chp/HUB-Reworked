@@ -10,8 +10,10 @@ class Server {
   private static _instance: Server;
   private _epi: Epitech;
 
-  private constructor(epi: Epitech) {
-    this._epi = epi;
+  private constructor(epi?: Epitech) {
+    if (epi !== undefined) {
+      this._epi = epi;
+    }
     this._openConnection();
   }
 
@@ -19,7 +21,7 @@ class Server {
   // *                                Public                                * //
   // *----------------------------------------------------------------------* //
 
-  public static getInstance(epi: Epitech): Server {
+  public static getInstance(epi?: Epitech): Server {
     if (Server._instance === undefined) {
       Server._instance = new Server(epi);
     }
@@ -47,8 +49,8 @@ class Server {
       }
 
       switch (data.op) {
-        // case "TEST_OP":
-        //   return respond("some data");
+        case "TEST":
+          return respond(null);
 
         case "XP":
           const activities = await this._epi.fetchHubActivities();

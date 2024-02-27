@@ -5,10 +5,8 @@ import { compilerOptions } from "./tsconfig.json";
 module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
-  // verbose: true,
   setupFiles: ["./tests/__mocks__/chrome.js", "./tests/__mocks__/console.js"],
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: "<rootDir>/src/" }),
-  // resolver: '<rootDir>/tests/customJestResolver.js',
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', {
       diagnostics: {

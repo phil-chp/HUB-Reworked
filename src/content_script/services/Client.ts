@@ -24,7 +24,7 @@ class Client {
     return Client._instance;
   }
 
-  public send(op: "TEST_OP"): Promise<string>;
+  public send(op: "TEST"): Promise<any>;
 
   public send(op: "EVENTS"): Promise<HUBEvents>;
 
