@@ -1,28 +1,34 @@
 import DataHubActivities from "@shared/types/DataHubActivities";
 import HUBEvents from "@shared/types/HUBEvents";
 import HubActivity from "@shared/types/HubActivity";
+import { mySleep } from "@content_script/services/utils";
 
 class Client {
-  // *----------------------------------------------------------------------* //
-  // *                                Private                               * //
-  // *----------------------------------------------------------------------* //
-
-  private static _instance: Client;
   private _socket: chrome.runtime.Port;
 
-  private constructor() {
+  constructor() {
     this._socket = chrome.runtime.connect();
   }
 
-  // *----------------------------------------------------------------------* //
-  // *                                Public                                * //
-  // *----------------------------------------------------------------------* //
-
-  public static getInstance(): Client {
-    if (Client._instance === undefined) {
-      Client._instance = new Client();
+  public async fetchData(op: any, maxAttempts = 5): Promise<any> {
+    let attemptsLeft = maxAttempts;
+    while (true) {
+      try {
+        const res = await this.send(op);
+        if (res.d === undefined) {
+          throw new Error("An error occured.");
+        }
+        return res;
+      } catch (error: any) {
+        console.warn(`Error occured while fetching ${op} (Attempt ${maxAttempts - attemptsLeft + 1}/${maxAttempts})...`);
+        if (attemptsLeft >= 0) {
+          --attemptsLeft;
+          await mySleep(500 * (maxAttempts - attemptsLeft));
+        } else {
+          throw error;
+        }
+      }
     }
-    return Client._instance;
   }
 
   public send(op: "TEST"): Promise<any>;
@@ -32,6 +38,8 @@ class Client {
   public send(op: "GET_XP"): Promise<DataHubActivities>;
 
   public send(op: "UPDATE_XP", d: HubActivity[]): Promise<void>;
+
+  // public send(op: "USER_INFO"): Promise<DataUser>;
 
   public send(op: string, d: any = null): Promise<any> {
     return new Promise((resolve) => {

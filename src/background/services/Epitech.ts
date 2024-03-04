@@ -11,7 +11,6 @@ const LIMIT = pLimit(20);
 
 export default class Epitech {
   private _LS: chrome.storage.LocalStorageArea;
-  toto: boolean;
 
   private _userInfo: User;
   private _scrapperMeetup: ScrapperMeetup;
@@ -21,7 +20,6 @@ export default class Epitech {
     this._LS = chrome.storage.local;
     // this._LS.clear();
     this._hubActivities = [];
-    this.toto = true;
   }
 
   // *----------------------------------------------------------------------* //
@@ -33,10 +31,6 @@ export default class Epitech {
    * cookie and the user info necessary for later.
    */
   public async init(): Promise<void> {
-    const _exipresIn = await this._LS.get("exipresIn");
-    const _hubActivities = await this._LS.get("hubActivities");
-    const _hubActivitiesHash = await this._LS.get("hubActivitiesHash");
-    console.log(_exipresIn, _hubActivities, _hubActivitiesHash);
     this._userInfo = await this._fetchUserInfo();
     this._scrapperMeetup = new ScrapperMeetup(this._userInfo.city, this._userInfo.country);
     this._scrapperMeetup.init();
@@ -61,25 +55,16 @@ export default class Epitech {
     if (this._userInfo === undefined) {
       throw new Error("User info not found. Please call `Epitech.init()` first.");
     }
+    const { hubActivitiesHash } = await this._LS.get("hubActivitiesHash");
+    const hubActivitiesRecord: Record<string, HubActivity> = hubActivitiesHash || {};
+    this._hubActivities = Object.values(hubActivitiesRecord);
+
     if (this._hubActivities.length > 0) {
       return this._hubActivities;
     }
     // const hasExpired = this._LS.get("exipresIn", (res) => {
     //   return (res.exipresIn !== undefined && res.exipresIn > Date.now());
     // });
-    const data = await new Promise((resolve) => {
-      this._LS.get("hubActivities", (res) => {
-        if (res.hubActivities !== undefined) {
-          resolve(res.hubActivities);
-        }
-        resolve(undefined);
-      });
-    }).catch(() => undefined);
-
-    if (data !== undefined) {
-      this._hubActivities = data as HubActivity[];
-      return this._hubActivities;
-    }
 
     // this._userInfo.year = "2022"; // FIXME: REMOVE
     // this._userInfo.city = "NCE";  // FIXME: REMOVE
@@ -87,7 +72,6 @@ export default class Epitech {
 
     await this._fetchHubRegionalActivities(year, city);
     await this._fetchHubRegionalActivities(year, country);
-
     await this._updateActivitiesHash(this._hubActivities);
 
     // this._LS.set({ exipresIn: Date.now() + 1000 * 60 * 60 * 24 }); // TODO: Beta test this timer
@@ -95,7 +79,6 @@ export default class Epitech {
   }
 
   public async updateHubActivities(activities: HubActivity[]) {
-    this.toto = false;
     await this._updateActivitiesHash(activities);
   }
 
@@ -106,27 +89,24 @@ export default class Epitech {
   private async _updateActivitiesHash(activities: HubActivity[]) {
     console.log("Updating hash map with: ", activities);
 
-    const hubActivitiesHash = await this._LS.get("hubActivitiesHash")|| {};
-    console.log("HASH MAP Before update: ", hubActivitiesHash);
-    if (!this.toto) return;
+    const { hubActivitiesHash } = await this._LS.get("hubActivitiesHash");
+    const hubActivitiesRecord: Record<string, HubActivity> = hubActivitiesHash || {};
+
     for (const activity of activities) {
+      const savedActivity = hubActivitiesRecord[activity.codeacti];
       if (
-        hubActivitiesHash[activity.codeacti] !== undefined &&
-        (hubActivitiesHash[activity.codeacti].type === "Project" ||
-          hubActivitiesHash[activity.codeacti].type === "Experience")
+        savedActivity !== undefined &&
+        (savedActivity.type === "Project" || savedActivity.type === "Experience") &&
+        savedActivity.xp !== 0
       ) {
-        const grade = hubActivitiesHash[activity.codeacti].grade;
-        hubActivitiesHash[activity.codeacti] = activity;
-        if (grade !== 0) hubActivitiesHash[activity.codeacti].grade = grade;
+        console.log("Saving XP", activity.codeacti, savedActivity);
+        hubActivitiesRecord[activity.codeacti] = activity;
+        hubActivitiesRecord[activity.codeacti].xp = savedActivity.xp;
       } else {
-        hubActivitiesHash[activity.codeacti] = activity;
+        hubActivitiesRecord[activity.codeacti] = activity;
       }
     }
-    // await this._LS.remove("hubActivitiesHash");
-    await this._LS.set({ hubActivitiesHash });
-
-    const res = await this._LS.get('hubActivitiesHash');
-    console.log("HASH MAP After update: ", res);
+    await this._LS.set({ hubActivitiesHash: hubActivitiesRecord });
   }
 
   /**
@@ -162,10 +142,14 @@ export default class Epitech {
 
     for (const campus of euroCampuses) {
       // TODO Change these to "HEAD" requests
-      const response = await IntraAPI.getInstance().fetch(`module/${year}/B-INN-000/${campus}-0-1`, false);
-      if (response !== null) {
-        correctCampus = campus;
-        break;
+      try {
+        const response = await IntraAPI.getInstance().fetch(`module/${year}/B-INN-000/${campus}-0-1`, false);
+        if (response !== null) {
+          correctCampus = campus;
+          break;
+        }
+      } catch (_) {
+        continue;
       }
     }
     return correctCampus || "PAR";

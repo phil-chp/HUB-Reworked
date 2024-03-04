@@ -6,4 +6,9 @@ interface User {
     city: string;
 }
 
+// export interface DataUser {
+//     d: number;
+//     user: User;
+// }
+
 export default User;

@@ -48,12 +48,15 @@ class Server {
         });
       }
 
+      console.log("Received message:", data);
       switch (data.op) {
         case "TEST":
+          console.log("    Test");
           return respond(null);
 
         case "GET_XP":
           const activities = await this._epi.fetchHubActivities();
+          console.log("    Activities:", activities);
           return respond({
             d: Date.now(),
             activities,
@@ -61,16 +64,26 @@ class Server {
 
         case "UPDATE_XP":
           this._epi.updateHubActivities(data.d);
+          console.log("    Updated XP");
           return respond({
             d: Date.now(),
           } as DataEmptyReply);
 
         case "EVENTS":
           const events = await this._epi.scrapeEvents(20);
+          console.log("    Events:", events);
           return respond({
             d: Date.now(),
             events,
           } as HUBEvents); // TODO: Rename HUBEvents to DataHUBEvents for consistency or vice-versa
+
+        // case "USER_INFO":
+        //   const user = this._epi.getUserInfo();
+        //   console.log("    User info:", user);
+        //   return respond({
+        //     d: Date.now(),
+        //     user,
+        //   } as DataUser);
       }
     });
   }

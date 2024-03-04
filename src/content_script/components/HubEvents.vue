@@ -1,25 +1,35 @@
 <template>
   <div class="note">
-    <label>Events</label>
-    <a @click="toggle()" class="toggle-events"><span class="value">View HUB Events</span></a>
+    <label>Évenements</label>
+    <span class="value event-info">
+      <div>{{ events_hint }}</div>
+      <div v-if="status == Status.SUCCESS" @click="toggle">
+        <info-icon class="icon-hub"></info-icon>
+      </div>
+      <div v-if="status == Status.ERROR">
+        <info-icon class="icon-hub" hint-message="Rechargez la page."></info-icon>
+      </div>
+    </span>
   </div>
 
-  <div class="popup-events-wrapper" v-if="popupStatus" @click='() => { popupStatus = false }'>
-    <div class="popup-events" @click.stop>
-      <div class='card' v-for='(event, index) in events' :key='index' onerror="this.style.display='none'">
-        <a class="link" :href="event.url" target="_blank">
-          <img :src='event.thumbnail' />
-          <div class='card-info'>
-            <div class='card-header'>
-              <p class='card-header-title'>{{ event.title }}</p>
+  <div class="popup-events-anchor" v-if="popupStatus">
+    <div class="popup-events-wrapper" @click='() => { popupStatus = false }'>
+      <div class="popup-events" @click.stop>
+        <div class='card' v-for='(event, index) in events' :key='index' onerror="this.style.display='none'">
+          <a class="link" :href="event.url" target="_blank">
+            <img :src='event.thumbnail' />
+            <div class='card-info'>
+              <div class='card-header'>
+                <p class='card-header-title'>{{ event.title }}</p>
+              </div>
+              <div class='card-content'>
+                <p class='date'>{{ event.date }}</p>
+                <p class='location'>{{ event.venue }}</p>
+                <p class='description'>{{ event.description }}</p>
+              </div>
             </div>
-            <div class='card-content'>
-              <p class='date'>{{ event.date }}</p>
-              <p class='location'>{{ event.venue }}</p>
-              <p class='description'>{{ event.description }}</p>
-            </div>
-          </div>
-        </a>
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -29,37 +39,32 @@
 import { ref, onMounted } from "vue";
 import Client from "@content_script/services/Client";
 import { HUBEvent } from "@shared/types/HUBEvents";
+import InfoIcon from "@content_script/assets/InfoIcon.vue";
+import ErrorIcon from "@content_script/assets/ErrorIcon.vue";
+import { Status } from "@content_script/services/utils";
+
+let client = new Client();
 
 const events = ref([] as HUBEvent[]);
 const events_hint = ref("Loading...");
-const MAX_ATTEMPTS = 5;
-const fetchAttempts = ref(MAX_ATTEMPTS);
+
+const status = ref(Status.NONE);
 
 const popupStatus = ref(false);
 
 onMounted(async () => {
-  const res = await fetchEvents();
-  console.log("Events: ", res.events);
+  const res = await client.fetchData("EVENTS").catch(() => {
+    status.value = Status.ERROR;
+    events_hint.value = "Erreur.";
+  });
+  // console.log("Events: ", res.events);
+
   if (res.events.length > 0) {
+    status.value = Status.SUCCESS;
+    events_hint.value = "View HUB Events";
     events.value = res.events;
   }
 });
-
-async function fetchEvents(): Promise<any> {
-  while (true) {
-    try {
-      return await Client.getInstance().send("EVENTS");
-    } catch (error: any) {
-      if (fetchAttempts.value > 0) {
-        --fetchAttempts.value;
-        await mySleep(500 * (MAX_ATTEMPTS - fetchAttempts.value));
-      } else {
-        events_hint.value = "Error.";
-        throw error;
-      }
-    }
-  }
-}
 
 function toggle() {
   popupStatus.value = !popupStatus.value;
@@ -71,40 +76,61 @@ function mySleep(ms: number): Promise<void> {
 </script>
 
 <style scoped>
-.toggle-events {
-  cursor: pointer;
-  color: black;
-  text-decoration: none;
+.event-info {
+  display: flex !important;
+  align-items: center;
+  gap: 5px;
 }
-.toggle-events:hover {
-  text-decoration: underline;
+
+
+
+.popup-events-anchor {
+  position: fixed;
+  inset: 0;
+  display: block;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 2147483645;
 }
 
 .popup-events-wrapper {
   position: absolute;
-  top: 0;
-  left: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   height: 100%;
   width: 100%;
   text-align: center;
-  background-color: rgba(0, 0, 0, 0.75);
-  z-index: 2147483646;
   overflow-y: scroll;
+  z-index: 2147483646;
 }
 
 .popup-events {
   position: relative;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  max-height: 80%;
+  max-width: calc(400px * 2 + 24px);
   display: flex;
   flex-wrap: wrap;
-  max-width: 824px;
-  max-height: 80%;
   gap: 24px;
-  justify-content: space-between;
+  justify-content: center;
+  margin-bottom: 10px;
+  overflow-y: auto;
   z-index: 2147483647;
 }
+
+/* @media (max-width: 1247px) {
+  .popup-events {
+    max-width: 824px;
+  }
+}
+@media (max-width: 823px) {
+  .popup-events {
+    max-width: 100%;
+  }
+} */
 
 .card {
   position: relative;
@@ -136,7 +162,7 @@ function mySleep(ms: number): Promise<void> {
   z-index: 2;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.8));
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.4));
 }
 
 .card-header {
@@ -148,10 +174,11 @@ function mySleep(ms: number): Promise<void> {
 }
 
 .card-header-title {
-  font-size: 20px; /* Adjust based on your requirement */
+  font-size: 20px;
+  text-align: left;
   font-weight: bold;
   margin: 0;
-  max-height: 4.8em; /* for 2 lines of text */
+  max-height: 4.8em;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -172,7 +199,7 @@ function mySleep(ms: number): Promise<void> {
 
 .date, .location {
   margin: 0;
-  font-size: 16px; /* Adjust based on your requirement */
+  font-size: 16px;
   text-align: right;
   font-weight: bold;
 }
@@ -181,81 +208,11 @@ function mySleep(ms: number): Promise<void> {
   margin: 0;
   font-size: 14px;
   max-height: 4.8em;
-  text-align: justify;
+  text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
 }
-
-
-
-
-/* .card {
-  position: relative;
-  margin: 8px;
-  width: 300px;
-  height: 200px;
-  background-color: white;
-  border-radius: 5px;
-  border: solid 1px black;
-}
-
-.card .link {
-  text-decoration: none;
-}
-
-.card .card-image {
-  width: 100%;
-  height: 100px;
-  overflow: hidden;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-}
-
-.card .card-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.card .card-info {
-  position: relative;
-  padding: 8px;
-  height: 100px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.card .card-info .card-header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.card .card-info .card-header .card-header-title {
-  font-size: 1em;
-  color: white;
-}
-
-.card .card-info .date {
-  font-size: 0.8em;
-  color: black;
-}
-
-.card .card-info .location {
-  font-size: 0.8em;
-  color: black;
-}
-
-.card .card-info .description {
-  font-size: 0.8em;
-  color: black;
-} */
 </style>

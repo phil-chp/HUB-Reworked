@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "module": "esnext",
     "target": "esnext",
     "jsx": "preserve",

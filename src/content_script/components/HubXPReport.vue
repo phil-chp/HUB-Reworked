@@ -3,65 +3,83 @@
     <label>Hub</label>
     <span class="value xp-info">
       <strong>XP&nbsp;:&nbsp;{{ xp < 0 ? xp_hint : xp }}</strong>
-      <warn-icon
-        v-if="needUserInput.length > 0"
-        class="warn-icon-hub"
-        @click="requestUserInput()"
-      ></warn-icon>
+
+      <div v-if="status == Status.NEED_USER_INPUT" @click="requestUserInput">
+        <warn-icon class="icon-hub"></warn-icon>
+      </div>
+      <div v-if="status == Status.SUCCESS" @click="viewDetails">
+        <info-icon class="icon-hub"></info-icon>
+      </div>
+      <div v-if="status == Status.ERROR">
+        <error-icon class="icon-hub" hint-message="Rechargez la page."></error-icon>
+      </div>
+
     </span>
+
+    <div class="popup-details-anchor" v-if="popupStatus">
+      <div class="popup-details-wrapper" @click='() => { popupStatus = false }'>
+        <table class="popup-details" @click.stop>
+          <thead>
+            <tr>
+              <th>Activity</th>
+              <th>XP</th>
+              <th>Presences</th>
+              <th>Absences</th>
+            </tr>
+          </thead>
+          <tbody class='row' v-for='(event, index) in activities' :key='index' onerror="this.style.display='none'">
+            <tr>
+              <td>{{ event.title }}</td>
+              <td>{{ event.xp / (event.members || 1) }}</td>
+              <td>{{ event.presences }}</td>
+              <td>{{ event.absences }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import Client from "@content_script/services/Client";
 import HubActivity from "@shared/types/HubActivity";
 import WarnIcon from "@content_script/assets/WarnIcon.vue";
+import InfoIcon from "@content_script/assets/InfoIcon.vue";
+import ErrorIcon from "@content_script/assets/ErrorIcon.vue";
+import { Status } from "@content_script/services/utils";
+
+let client = new Client();
 
 const xp = ref(-1);
 const xp_hint = ref("Loading...");
-
-const MAX_ATTEMPTS = 5;
-const fetchAttempts = ref(MAX_ATTEMPTS);
+const activities = ref([] as HubActivity[]);
 
 const needUserInput = ref([] as HubActivity[]);
+const status = ref(Status.NONE);
+
+const popupStatus = ref(false);
 
 onMounted(async () => {
-  const res = await fetchXP();
+  const res = await client.fetchData("GET_XP").catch(() => {
+    xp_hint.value = "Error.";
+    status.value = Status.ERROR;
+  })
+  console.log("Activities: ", res.activities);
 
-  if (res.activities.length > 0) {
+  if (res.activities?.length > 0) {
+    activities.value = res.activities;
     xp.value = calculateXP(res.activities);
     const needInput = await needUserInput.value;
-    console.log("Need User input: ", needInput);
-  }
-});
-
-// Client.getInstance().send("XP").then((res: DataHubActivities) => {
-//   console.log(`Attempt ${MAX_ATTEMPTS - fetchAttempts.value}: `, res);
-//   // if (res === undefined || res === null) {
-//   //   console.warn(`[Hub Reworked] Fetch failed, attempting again with ${500 * (MAX_ATTEMPTS - fetchAttempts.value)}ms delay`);
-//   //   setTimeout(async () => {
-//   //     await ;
-//   //   }, 500 * (MAX_ATTEMPTS - fetchAttempts.value));
-//   //   return;
-//   // }
-// });
-
-async function fetchXP(): Promise<any> {
-  while (true) {
-    try {
-      return await Client.getInstance().send("GET_XP");
-    } catch (error: any) {
-      if (fetchAttempts.value > 0) {
-        --fetchAttempts.value;
-        await mySleep(500 * (MAX_ATTEMPTS - fetchAttempts.value));
-      } else {
-        xp_hint.value = "Error.";
-        throw error;
-      }
+    if (needInput.length > 0) {
+      status.value = Status.NEED_USER_INPUT;
+      console.log("Need User input: ", needInput);
+    } else {
+      status.value = Status.SUCCESS;
     }
   }
-}
+});
 
 const calculateXP = (activities: HubActivity[]) => {
   let xp = 0;
@@ -69,14 +87,10 @@ const calculateXP = (activities: HubActivity[]) => {
     if (activity.type === "Project" && activity.xp === 0) {
       needUserInput.value.push(activity);
     }
-    xp += activity.xp;
+    xp += activity.xp / (activity.members || 1);
   }
   return xp;
 };
-
-function mySleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 function requestUserInput() {
   for (const activity of needUserInput.value) {
@@ -94,7 +108,7 @@ function requestUserInput() {
           alert("Invalid input, please enter a number.");
         }
 
-        if (_xp > 0 && _xp <= 84) {
+        if (_xp > 0 && _xp <= 84) { // Don't ask lol
           activity.xp = _xp;
           xp.value += _xp / activity.members;
           invalid = false;
@@ -107,10 +121,14 @@ function requestUserInput() {
 
   const toSave: HubActivity[] = needUserInput.value.filter(item => item.xp > 0) as HubActivity[];
   needUserInput.value = needUserInput.value.filter(item => item.xp <= 0);
+  if (toSave.length > 0) {
+    client.send("UPDATE_XP", toSave);
+  }
+}
 
-  console.log(toSave);
-
-  Client.getInstance().send("UPDATE_XP", toSave);
+function viewDetails() {
+  popupStatus.value = !popupStatus.value;
+  console.log("View details clicked.", popupStatus.value);
 }
 </script>
 
@@ -121,7 +139,61 @@ function requestUserInput() {
   gap: 5px;
 }
 
-.warn-icon-hub {
-  cursor: pointer;
+
+
+.popup-details-anchor {
+  position: fixed;
+  inset: 0;
+  display: block;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 2147483645;
+}
+
+.popup-details-wrapper {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  overflow-y: scroll;
+  z-index: 2147483646;
+}
+
+.popup-details {
+  position: relative;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  max-height: 80%;
+  max-width: 80%;
+  width: 100%; /* ? */
+  border-collapse: collapse;
+  margin-bottom: 10px;
+  overflow-y: auto;
+  z-index: 2147483647;
+}
+
+table tr {
+  border-bottom: 1px solid #ddd;
+}
+
+table tr:last-child {
+  border-bottom: none;
+}
+
+table td {
+  padding: 10px 0;
+  text-align: center;
+}
+
+table td:first-child {
+  text-align: left;
+}
+
+table tr:hover {
+  background-color: #f5f5f5;
 }
 </style>

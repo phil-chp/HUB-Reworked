@@ -24,9 +24,3 @@ Build the extension:
 ```bash
 yarn build
 ```
-
-## TODO
-
-- [ ] Implement a hash map of `{ "codeacti": int }` to store all previous projects/experiences, and prevent spamming the server with requests.
-  - [ ] This list needs to be stored and grabbed back from local storage, it should never be lost, and be reset on a new school year. (So if `this.userData.year` changes?)
-- [ ] Implement the sending of the hub activities to the client, requesting to the user info about how many xp they got from a specific project. These values need to be stored in the hash map to also never again bother the user with this project.
