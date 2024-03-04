@@ -4,8 +4,19 @@ const storageMock = (() => {
   let storage = {};
 
   return {
-    get: jest.fn((key, callback) => {
-      callback(key ? { [key]: storage[key] } : storage);
+    get: jest.fn((keys, callback) => {
+      const result = {};
+      if (Array.isArray(keys)) {
+        keys.forEach((key) => {
+          result[key] = storage[key];
+        });
+      } else {
+        for (const key in keys) {
+          result[key] = storage[key] || keys[key];
+        }
+      }
+      if (callback) callback(result);
+      return result;
     }),
     set: jest.fn((items, callback) => {
       storage = { ...storage, ...items };

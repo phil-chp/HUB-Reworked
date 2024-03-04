@@ -7,7 +7,7 @@ describe("Communication", () => {
 
   beforeAll(async () => {
     server = Server.getInstance();
-    client = Client.getInstance();
+    client = new Client();
   });
 
   test("is Client defined", async () => {
