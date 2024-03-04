@@ -18,7 +18,7 @@ const MOCK_RAW_HUB_ACTIVITY = {
 
 const MOCK_USER_DATA = {
   login: "mock.user@epitech.eu",
-  year: 2023,
+  year: "2023",
   semester: 7,
   country: "FR",
   city: "PAR",
