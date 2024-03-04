@@ -29,7 +29,7 @@ This section shows you the amount of XP you currently have, depending on your si
 
 This means that Hub Reworked is missing XP information about Project(s) and/or Experience(s) you have done.
 
-Please click on the sign, a series of questions will be prompted via an alert popup, asking you about the amount of XP you have gained for each specific activity.
+Please click on the icon, a series of questions will be prompted via an alert popup, asking you about the amount of XP you have gained for each specific activity.
 
 <img src="assets/doc/input-user-data.jpg" alt="User section on the intra" width="400px" />
 
@@ -43,7 +43,7 @@ _❗ As specified in the alert popup, if you have to submit the XP for a Project
 
 This means that Hub Reworked has all the information it needs to calculate your XP. You can view your total XP directly next to the info circle.
 
-If you which to get more information, please click on the icon, this will open a popup table containing information about all your Hub activities with some extra details about them.
+If you wish to get more information, please click on the icon, this will open a popup table containing information about all your Hub activities with some extra details about them.
 
 <img src="assets/doc/interact-xp.jpg" alt="User section on the intra" width="300px" />
 
