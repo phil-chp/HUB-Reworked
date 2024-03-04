@@ -3,13 +3,13 @@
 
 A simple tool to calculate the amount of XP you currently have to validate your Epitech Hub module.
 
-## Usage
+## Documentation
 
-Add as an extension to your chrome browser.
+Go to [Documentation](./Documentation.md) for more information.
 
-Go to `chrome://extensions`, on the top right enable "Developer Mode", then on the top left, you can select "Load unpacked". Select this folder, and you should be good!
+## Contributing
 
-## Dev
+### Dev
 
 Start in development (with watch) mode:
 
@@ -17,7 +17,7 @@ Start in development (with watch) mode:
 yarn start
 ```
 
-## Build
+### Build
 
 Build the extension:
 
