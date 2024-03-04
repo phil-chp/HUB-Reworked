@@ -122,6 +122,7 @@ function requestUserInput() {
   const toSave: HubActivity[] = needUserInput.value.filter(item => item.xp > 0) as HubActivity[];
   needUserInput.value = needUserInput.value.filter(item => item.xp <= 0);
   if (toSave.length > 0) {
+    status.value = Status.SUCCESS;
     client.send("UPDATE_XP", toSave);
   }
 }
@@ -170,30 +171,34 @@ function viewDetails() {
   max-height: 80%;
   max-width: 80%;
   width: 100%; /* ? */
-  border-collapse: collapse;
   margin-bottom: 10px;
   overflow-y: auto;
   z-index: 2147483647;
 }
 
-table tr {
+.popup-details thead {
+  background-color: #f5f5f5;
+}
+
+.popup-details tr {
   border-bottom: 1px solid #ddd;
 }
 
-table tr:last-child {
+.popup-details tr:last-child {
   border-bottom: none;
 }
 
-table td {
+.popup-details td {
   padding: 10px 0;
   text-align: center;
 }
 
-table td:first-child {
+.popup-details th:first-child,
+.popup-details td:first-child {
   text-align: left;
 }
 
-table tr:hover {
+.popup-details tbody tr:hover {
   background-color: #f5f5f5;
 }
 </style>

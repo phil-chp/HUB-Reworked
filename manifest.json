@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "HUB Reworked",
-  "version": "1.0",
+  "version": "1.0.1",
   "description": "The most advances HUB assistant for Epitech students (XP calculator + event finder)",
   "icons": {
     "16": "assets/icon16.png",
