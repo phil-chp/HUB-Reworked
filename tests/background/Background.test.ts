@@ -22,6 +22,24 @@ describe("Background", () => {
     const activities = await epi.fetchHubActivities();
     expect(activities).toBeDefined();
     expect(activities.length).toBeGreaterThan(0);
+
+    const activitiesStored = await epi.fetchHubActivities();
+    expect(activitiesStored).toBeDefined();
+
+    const activity = activities[0];
+    activity.type = "Project";
+    activity.xp = 9;
+    await epi.updateHubActivities([activity]);
   }, 15000);
 
+  test("Epitech::scrapeEvents", async () => {
+    const events = await epi.scrapeEvents(1);
+    expect(events).toBeDefined();
+    expect(events.length).toBeGreaterThan(0);
+  });
+
+  test("Epitech::init not called", async () => {
+    const epiNotInit = new Epitech();
+    expect(epiNotInit.fetchHubActivities()).rejects.toThrow(Error);
+  });
 });

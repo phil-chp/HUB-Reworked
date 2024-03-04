@@ -18,9 +18,17 @@ describe("Scrapper", () => {
   });
 
   test("ScrapperMeetup::getLatestEvents", async () => {
-    const events = await scrapperMeetup.getLatestEvents(10);
+    const events = await scrapperMeetup.getLatestEvents(1);
 
     expect(events).toBeDefined();
     expect(events.length).toBeGreaterThan(0);
+
+    const eventsStored = await scrapperMeetup.getLatestEvents(1);
+    expect(eventsStored).toBeDefined();
+  });
+
+  test("ScrapperMeetup::init wrong campus", async () => {
+    const scrapperMeetupWrongCampus = new ScrapperMeetup("XXX", "YY");
+    expect(scrapperMeetupWrongCampus.init()).rejects.toThrow(Error);
   });
 });

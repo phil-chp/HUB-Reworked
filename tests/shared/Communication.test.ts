@@ -1,5 +1,6 @@
 import Server from "@background/services/Server";
 import Client from "@content_script/services/Client";
+import Epitech from "@background/services/Epitech";
 
 describe("Communication", () => {
   let server: Server;
@@ -19,15 +20,18 @@ describe("Communication", () => {
   });
 
   test("Client & Server: TEST event two-way handling", async () => {
-    const data = await client.send('TEST');
+    const data = await client.send("TEST");
     expect(data).toEqual(null); // TODO: Hack
-
-
-    // await client.send("XP")
-    //   .then((res: DataHubActivities) => {
-    //     expect(res).toBeDefined();
-    //     expect(res.activities).toBeDefined();
-    //     expect(res.activities?.length).toBeGreaterThan(0);
-    //   });
   });
+
+  test("Server: undefined Epitech", async () => {
+    const epi = new Epitech();
+    const serverNoEpi = Server.getInstance(epi);
+    expect(serverNoEpi).toBeDefined();
+  });
+
+  // test("Client: fetchData", async () => {
+  //   const data = await client.fetchData("TEST");
+  //   expect(data).toBeDefined();
+  // });
 });
