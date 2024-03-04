@@ -6,7 +6,7 @@
   "author": "Philippe Cheype",
   "license": "MIT",
   "scripts": {
-    "start": "webpack --mode=development",
+    "start": "webpack --mode=development --watch",
     "build": "webpack --mode=production",
     "test": "jest",
     "coverage": "jest --coverage"
