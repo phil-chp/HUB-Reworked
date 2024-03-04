@@ -3,7 +3,6 @@ const { VueLoaderPlugin } = require("vue-loader");
 const webpack = require("webpack");
 
 module.exports = {
-  mode: "development", // TODO: 'production'
   entry: {
     background: "./src/background/index.ts",
     content_script: "./src/content_script/index.ts",
