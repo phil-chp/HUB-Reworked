@@ -1,9 +1,5 @@
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env["OPENAI_API_KEY"],
-});
-
 const agent_instruction = `You are a consultant for tech students please generate a list of exactly 4 ideas (2 xp and 2 prj) this student can create in relation to the keywords they will give you. Make the ideas feasible in 1 month by for a student.
 
 Please generate the text in the following format (do not include the backticks, nor the <placeholders>):
@@ -21,15 +17,10 @@ Please make all 4 ideas feasible depending on their specific contexts (xp, prj)
 
 Stay extremely brief, do not write anything more than the 3 ideas. For each of them, try to stay under 15 words.`;
 
-const assistant = await openai.beta.assistants.create({
-  name: "Idea Consultant",
-  instructions: agent_instruction,
-  tools: [],
-  model: "gpt-3.5-turbo",
-});
 
-const thread = await openai.beta.threads.create();
-
+let openai = null;
+let assistant = null;
+let thread = null;
 
 function awaitResponse(threadId: string, runId: string): Promise<string> {
   return new Promise(async (resolve, reject) => {
@@ -53,6 +44,19 @@ function awaitResponse(threadId: string, runId: string): Promise<string> {
 
 
 export default async function generateIdeas(keywords: string[]) {
+  if (!openai) {
+    openai = new OpenAI({
+      apiKey: process.env["OPENAI_API_KEY"],
+    });
+    assistant = await openai.beta.assistants.create({
+      name: "Idea Consultant",
+      instructions: agent_instruction,
+      tools: [],
+      model: "gpt-3.5-turbo",
+    });
+    thread = await openai.beta.threads.create();
+  }
+
   const message = await openai.beta.threads.messages.create(thread.id, {
     role: "user",
     content: keywords.join(" "),
@@ -69,6 +73,7 @@ export default async function generateIdeas(keywords: string[]) {
     return res.split("\n")
       .filter((x) => x !== "" && x !== "```")
       .map((x) => x.replace(/<(xp|prj)\d>/g, "")
+        .replace(/(xp|prj)\d:/g, "")
         .trim());
   } catch (e) {
     // ignore

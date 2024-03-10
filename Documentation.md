@@ -54,3 +54,14 @@ As an extra feature, Hub Reworked will suggest you some events you can do to gai
 Click on the blue info icon to see the events.
 
 <img src="assets/doc/interact-events.jpg" alt="User section on the intra" width="300px" />
+
+## OpenAI Idea generator
+
+Currently this feature is not compatible with releases, I reached my delivery dead-line and I'm overloaded with work so I will not be implementing it shortly, if you which to use it, you can just:
+
+1. clone the latest version of the repo
+2. add a `.env` file in the root
+3. inside add: `OPENAI_API_KEY=<your_key>` (❗ Make sure to give the kep "all" permission, there is a bug from the OpenAI team, for some reason the openai npm package tries to access routes even though you don't use them, and just crashes if you restrict it)
+4. `yarn install`
+5. `yarn build`
+6. Load this folder as an unpacked extension in the chrome extensions page.
