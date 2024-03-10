@@ -2,6 +2,8 @@ import DataHubActivities from "@shared/types/DataHubActivities";
 import Epitech from "@background/services/Epitech";
 import HUBEvents from "@shared/types/HUBEvents";
 import DataEmptyReply from "@shared/types/DataEmptyReply";
+import generateIdeas from "./GPT";
+import DataIdeas from "@shared/types/Idea";
 
 class Server {
   // *----------------------------------------------------------------------* //
@@ -84,6 +86,13 @@ class Server {
             d: Date.now()
           }); // TODO: Rename HUBEvents to DataHUBEvents for consistency or vice-versa
 
+        case "GENERATE_IDEAS":
+          const response = await generateIdeas(data.d)
+          console.log("    Generated ideas:", response);
+          return respond({
+            d: Date.now(),
+            ideas: response,
+          } as DataIdeas);
 
         // case "USER_INFO":
         //   const user = this._epi.getUserInfo();

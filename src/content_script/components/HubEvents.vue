@@ -7,7 +7,10 @@
         <info-icon class="icon-hub"></info-icon>
       </div>
       <div v-if="status == Status.ERROR">
-        <info-icon class="icon-hub" hint-message="Rechargez la page."></info-icon>
+        <error-icon class="icon-hub" hint-message="Rechargez la page."></error-icon>
+      </div>
+      <div v-if="status == Status.SUCCESS">
+        <idea-icon class="icon-hub" @click="generateIdeas()"></idea-icon>
       </div>
     </span>
   </div>
@@ -15,6 +18,18 @@
   <div class="popup-events-anchor" v-if="popupStatus">
     <div class="popup-events-wrapper" @click='() => { popupStatus = false }'>
       <div class="popup-events" @click.stop>
+        <div class='card card-generated' v-for='(idea, index) in ideas' :key='index' onerror="this.style.display='none'">
+          <img src="https://source.unsplash.com/400x300/?idea,tech" />
+          <div class='card-info'>
+            <div class='card-header'>
+              <p class='card-header-title'>{{ idea.title }}</p>
+            </div>
+            <div class='card-content'>
+              <div class='description'>{{ idea.description }}</div>
+            </div>
+          </div>
+        </div>
+
         <div class='card' v-for='(event, index) in events' :key='index' onerror="this.style.display='none'">
           <a class="link" :href="event.url" target="_blank">
             <img :src='event.thumbnail' />
@@ -39,13 +54,17 @@
 import { ref, onMounted } from "vue";
 import Client from "@content_script/services/Client";
 import { HUBEvent } from "@shared/types/HUBEvents";
+import { Idea } from "@shared/types/Idea";
 import InfoIcon from "@content_script/assets/InfoIcon.vue";
+import WarnIcon from "@content_script/assets/WarnIcon.vue";
 import ErrorIcon from "@content_script/assets/ErrorIcon.vue";
+import IdeaIcon from "@content_script/assets/IdeaIcon.vue";
 import { Status } from "@content_script/services/utils";
 
 let client = new Client();
 
 const events = ref([] as HUBEvent[]);
+const ideas = ref([] as Idea[]);
 const events_hint = ref("Loading...");
 
 const status = ref(Status.NONE);
@@ -70,8 +89,10 @@ function toggle() {
   popupStatus.value = !popupStatus.value;
 }
 
-function mySleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+async function generateIdeas() {
+  const res = await client.send("GENERATE_IDEAS", [ "cybersecurity" ]);
+  let n = 0;
+  ideas.value.push(...res.ideas.map((r: string) => ({ description: r, type: "generated", title: (n++ < 2 ? "Experience" : "Project") })) as Idea[]);
 }
 </script>
 
@@ -155,6 +176,7 @@ function mySleep(ms: number): Promise<void> {
   height: 100%;
   object-fit: cover;
   z-index: 1;
+  filter: brightness(0.4);
 }
 
 .card-info {
@@ -162,7 +184,7 @@ function mySleep(ms: number): Promise<void> {
   z-index: 2;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.4));
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .card-header {
@@ -191,7 +213,6 @@ function mySleep(ms: number): Promise<void> {
   bottom: 0;
   left: 0;
   text-align: left;
-  background-color: rgba(0, 0, 0, 0.5);
   width: calc(100% - 32px);
   padding: 16px;
   z-index: 3;
@@ -206,13 +227,20 @@ function mySleep(ms: number): Promise<void> {
 
 .description {
   margin: 0;
+  margin-top: 1em;
   font-size: 14px;
-  max-height: 4.8em;
+  max-height: 6,8em;
   text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
+}
+
+.card-generated .description {
+  font-size: 16px;
+  max-height: 9.6em;
+  -webkit-line-clamp: 6;
 }
 </style>

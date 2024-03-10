@@ -67,7 +67,7 @@ export default class IntraAPI {
 
     if (response.ok === false) {
       if (warn == true) {
-        console.error(
+        console.log(
           "Error fetching data:",
           response.status,
           response.statusText

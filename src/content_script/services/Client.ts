@@ -2,6 +2,7 @@ import DataHubActivities from "@shared/types/DataHubActivities";
 import HUBEvents from "@shared/types/HUBEvents";
 import HubActivity from "@shared/types/HubActivity";
 import { mySleep } from "@content_script/services/utils";
+import DataIdeas from "@shared/types/Idea";
 
 class Client {
   private _socket: chrome.runtime.Port;
@@ -20,7 +21,7 @@ class Client {
         }
         return res;
       } catch (error: any) {
-        console.warn(`Error occured while fetching ${op} (Attempt ${maxAttempts - attemptsLeft + 1}/${maxAttempts})...`);
+        console.log(`Error occured while fetching ${op} (Attempt ${maxAttempts - attemptsLeft + 1}/${maxAttempts})...`);
         if (attemptsLeft >= 0) {
           --attemptsLeft;
           await mySleep(500 * (maxAttempts - attemptsLeft));
@@ -40,6 +41,8 @@ class Client {
   public send(op: "UPDATE_XP", d: HubActivity[]): Promise<void>;
 
   public send(op: "RESET_XP"): Promise<void>;
+
+  public send(op: "GENERATE_IDEAS", d: string[]): Promise<DataIdeas>;
 
   // public send(op: "USER_INFO"): Promise<DataUser>;
 

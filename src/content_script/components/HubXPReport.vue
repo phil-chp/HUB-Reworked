@@ -109,7 +109,7 @@ function requestUserInput() {
           alert("Invalid input, please enter a number.");
         }
 
-        if (_xp > 0 && _xp <= 84) { // Don't ask lol
+        if (_xp > 0 && _xp <= 200) { // Don't ask lol
           activity.xp = _xp;
           xp.value += _xp / activity.members;
           invalid = false;

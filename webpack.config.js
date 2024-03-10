@@ -1,6 +1,7 @@
 const path = require("path");
 const { VueLoaderPlugin } = require("vue-loader");
 const webpack = require("webpack");
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
   entry: {
@@ -38,6 +39,7 @@ module.exports = {
       // Disable detailed hydration mismatch warnings in production
       __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false),
     }),
+    new Dotenv(),
   ],
   resolve: {
     extensions: [".ts", ".js", ".vue"],
