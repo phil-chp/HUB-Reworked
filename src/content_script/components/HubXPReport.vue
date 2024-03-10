@@ -35,6 +35,7 @@
               <td>{{ event.absences }}</td>
             </tr>
           </tbody>
+          <a @click="resetStats()">Reset all XP info?</a>
         </table>
       </div>
     </div>
@@ -131,6 +132,16 @@ function viewDetails() {
   popupStatus.value = !popupStatus.value;
   console.log("View details clicked.", popupStatus.value);
 }
+
+function resetStats() {
+  client.send("RESET_XP");
+  activities.value = [];
+  xp.value = -1;
+  status.value = Status.NONE;
+  popupStatus.value = false;
+  location.reload();
+}
+
 </script>
 
 <style scoped>

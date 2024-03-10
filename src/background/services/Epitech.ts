@@ -48,6 +48,10 @@ export default class Epitech {
     return this._scrapperMeetup.getLatestEvents(n);
   }
 
+  public resetEvents() {
+    this._LS.remove("hubActivitiesHash");
+  }
+
   /**
    * Fetch the hub activities from the Epitech API
    */

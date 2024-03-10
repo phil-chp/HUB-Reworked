@@ -39,6 +39,8 @@ class Client {
 
   public send(op: "UPDATE_XP", d: HubActivity[]): Promise<void>;
 
+  public send(op: "RESET_XP"): Promise<void>;
+
   // public send(op: "USER_INFO"): Promise<DataUser>;
 
   public send(op: string, d: any = null): Promise<any> {

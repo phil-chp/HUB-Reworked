@@ -77,6 +77,14 @@ class Server {
             events,
           } as HUBEvents); // TODO: Rename HUBEvents to DataHUBEvents for consistency or vice-versa
 
+        case "RESET_XP":
+          await this._epi.resetEvents();
+          console.log("    Reset events cache");
+          return respond({
+            d: Date.now()
+          }); // TODO: Rename HUBEvents to DataHUBEvents for consistency or vice-versa
+
+
         // case "USER_INFO":
         //   const user = this._epi.getUserInfo();
         //   console.log("    User info:", user);
