@@ -29,9 +29,4 @@ describe("Communication", () => {
     const serverNoEpi = Server.getInstance(epi);
     expect(serverNoEpi).toBeDefined();
   });
-
-  // test("Client: fetchData", async () => {
-  //   const data = await client.fetchData("TEST");
-  //   expect(data).toBeDefined();
-  // });
 });

@@ -13,11 +13,17 @@
       <div v-if="status == Status.ERROR">
         <error-icon class="icon-hub" hint-message="Rechargez la page."></error-icon>
       </div>
-
     </span>
 
     <div class="popup-details-anchor" v-if="popupStatus">
-      <div class="popup-details-wrapper" @click='() => { popupStatus = false }'>
+      <div
+        class="popup-details-wrapper"
+        @click="
+          () => {
+            popupStatus = false;
+          }
+        "
+      >
         <table class="popup-details" @click.stop>
           <thead>
             <tr>
@@ -27,7 +33,7 @@
               <th>Absences</th>
             </tr>
           </thead>
-          <tbody class='row' v-for='(event, index) in activities' :key='index' onerror="this.style.display='none'">
+          <tbody class="row" v-for="(event, index) in activities" :key="index" onerror="this.style.display='none'">
             <tr>
               <td>{{ event.title }}</td>
               <td>{{ event.xp / (event.members || 1) }}</td>
@@ -43,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 import Client from "@content_script/services/Client";
 import HubActivity from "@shared/types/HubActivity";
 import WarnIcon from "@content_script/assets/WarnIcon.vue";
@@ -66,8 +72,8 @@ onMounted(async () => {
   const res = await client.fetchData("GET_XP").catch(() => {
     xp_hint.value = "Error.";
     status.value = Status.ERROR;
-  })
-  console.log("Activities: ", res.activities);
+  });
+  // console.log("Activities: ", res.activities);
 
   if (res.activities?.length > 0) {
     activities.value = res.activities;
@@ -75,7 +81,7 @@ onMounted(async () => {
     const needInput = await needUserInput.value;
     if (needInput.length > 0) {
       status.value = Status.NEED_USER_INPUT;
-      console.log("Need User input: ", needInput);
+      // console.log("Need User input: ", needInput);
     } else {
       status.value = Status.SUCCESS;
     }
@@ -97,7 +103,9 @@ function requestUserInput() {
   for (const activity of needUserInput.value) {
     let invalid = true;
     while (invalid) {
-      const xpRaw = window.prompt(`How many XP did you obtain from ${activity.title}\n(Enter the total value, even if there are multiple members)`);
+      const xpRaw = window.prompt(
+        `How many XP did you obtain from ${activity.title}\n(Enter the total value, even if there are multiple members)`
+      );
       let _xp = 0;
 
       if (xpRaw === "") {
@@ -109,7 +117,8 @@ function requestUserInput() {
           alert("Invalid input, please enter a number.");
         }
 
-        if (_xp > 0 && _xp <= 200) { // Don't ask lol
+        if (_xp > 0 && _xp <= 200) {
+          // Don't ask lol
           activity.xp = _xp;
           xp.value += _xp / activity.members;
           invalid = false;
@@ -120,8 +129,8 @@ function requestUserInput() {
     }
   }
 
-  const toSave: HubActivity[] = needUserInput.value.filter(item => item.xp > 0) as HubActivity[];
-  needUserInput.value = needUserInput.value.filter(item => item.xp <= 0);
+  const toSave: HubActivity[] = needUserInput.value.filter((item) => item.xp > 0) as HubActivity[];
+  needUserInput.value = needUserInput.value.filter((item) => item.xp <= 0);
   if (toSave.length > 0) {
     status.value = Status.SUCCESS;
     client.send("UPDATE_XP", toSave);
@@ -130,7 +139,6 @@ function requestUserInput() {
 
 function viewDetails() {
   popupStatus.value = !popupStatus.value;
-  console.log("View details clicked.", popupStatus.value);
 }
 
 function resetStats() {
@@ -141,7 +149,6 @@ function resetStats() {
   popupStatus.value = false;
   location.reload();
 }
-
 </script>
 
 <style scoped>
@@ -150,8 +157,6 @@ function resetStats() {
   align-items: center;
   gap: 5px;
 }
-
-
 
 .popup-details-anchor {
   position: fixed;

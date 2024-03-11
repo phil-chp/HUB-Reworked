@@ -55,13 +55,12 @@ Click on the blue info icon to see the events.
 
 <img src="assets/doc/interact-events.jpg" alt="User section on the intra" width="300px" />
 
-## OpenAI Idea generator
+## Legacy code
 
-Currently this feature is not compatible with releases, I reached my delivery dead-line and I'm overloaded with work so I will not be implementing it shortly, if you which to use it, you can just:
+This used to be a HUB Project, to be able to validate the maximum amount of XPs I added extra features in relation with the HUB, though I do not find them to be that useful nor did I polish them.
 
-1. clone the latest version of the repo
-2. add a `.env` file in the root
-3. inside add: `OPENAI_API_KEY=<your_key>` (❗ Make sure to give the kep "all" permission, there is a bug from the OpenAI team, for some reason the openai npm package tries to access routes even though you don't use them, and just crashes if you restrict it)
-4. `yarn install`
-5. `yarn build`
-6. Load this folder as an unpacked extension in the chrome extensions page.
+The true reason for making this extension was having an XP counter, and I belive this is also the case for most people that will use it.
+
+I did not delete all the old code though, if you want to look at it, or even contribute and polish it, feel free it's on the `legacy` branch.
+
+I will not be maintaing it. My focus will be on the main branch, and I will not be adding any new features to the legacy code.

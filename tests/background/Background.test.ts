@@ -32,12 +32,6 @@ describe("Background", () => {
     await epi.updateHubActivities([activity]);
   }, 15000);
 
-  test("Epitech::scrapeEvents", async () => {
-    const events = await epi.scrapeEvents(1);
-    expect(events).toBeDefined();
-    expect(events.length).toBeGreaterThan(0);
-  });
-
   test("Epitech::init not called", async () => {
     const epiNotInit = new Epitech();
     expect(epiNotInit.fetchHubActivities()).rejects.toThrow(Error);

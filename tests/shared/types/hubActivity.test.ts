@@ -1,11 +1,7 @@
-import HubActivity from "@shared/types/HubActivity";
 import HubTalk from "@shared/types/hubActivities/HubTalk";
 import HubWorkshop from "@shared/types/hubActivities/HubWorkshop";
 import RawHubActivity from "@shared/types/RawHubActivity";
 import HubHackathon from "@shared/types/hubActivities/HubHackathon";
-// import HubProject from "@shared/types/hubActivities/HubProject";
-// import HubExperience from "@shared/types/hubActivities/HubExperience";
-import User from '@shared/types/User';
 
 const MOCK_RAW_HUB_ACTIVITY = {
   codeacti: "acti-XXXXXX",
@@ -15,14 +11,6 @@ const MOCK_RAW_HUB_ACTIVITY = {
   events: [],
   end: "2100-01-01 23:42:00",
 } as RawHubActivity;
-
-const MOCK_USER_DATA = {
-  login: "mock.user@epitech.eu",
-  year: "2023",
-  semester: 7,
-  country: "FR",
-  city: "PAR",
-} as User;
 
 describe("Communication", () => {
   test("HubTalk: no event", async () => {
@@ -90,16 +78,4 @@ describe("Communication", () => {
     expect(await activity.init()).toBe(true);
     expect(activity.xp).toBe(-6);
   });
-
-  // test("HubProject: absent", async () => {
-  //   const activity = new HubProject(MOCK_RAW_HUB_ACTIVITY, MOCK_USER_DATA, "XXX");
-  //   expect(activity).toBeDefined();
-  //   expect(await activity.init()).toBe(false);
-  // });
-
-  // test("HubExperience: absent", async () => {
-  //   const activity = new HubExperience(MOCK_RAW_HUB_ACTIVITY, MOCK_USER_DATA, "XXX");
-  //   expect(activity).toBeDefined();
-  //   expect(await activity.init()).toBe(false);
-  // });
 });

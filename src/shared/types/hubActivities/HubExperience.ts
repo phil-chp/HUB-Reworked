@@ -16,9 +16,7 @@ export default class HubExperience extends HubActivity {
   // *----------------------------------------------------------------------* //
 
   public override async init(): Promise<boolean> {
-    if (
-      (await this._verifyPresence(this._userData.login, this._userData.year, this._region)) === false
-    ) {
+    if ((await this._verifyPresence(this._userData.login, this._userData.year, this._region)) === false) {
       return new Promise((resolve) => resolve(false));
     }
     this.xp = this._calculateXP();

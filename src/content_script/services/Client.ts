@@ -1,8 +1,6 @@
 import DataHubActivities from "@shared/types/DataHubActivities";
-import HUBEvents from "@shared/types/HUBEvents";
 import HubActivity from "@shared/types/HubActivity";
 import { mySleep } from "@content_script/services/utils";
-import DataIdeas from "@shared/types/Idea";
 
 class Client {
   private _socket: chrome.runtime.Port;
@@ -34,17 +32,11 @@ class Client {
 
   public send(op: "TEST"): Promise<any>;
 
-  public send(op: "EVENTS"): Promise<HUBEvents>;
-
   public send(op: "GET_XP"): Promise<DataHubActivities>;
 
   public send(op: "UPDATE_XP", d: HubActivity[]): Promise<void>;
 
   public send(op: "RESET_XP"): Promise<void>;
-
-  public send(op: "GENERATE_IDEAS", d: string[]): Promise<DataIdeas>;
-
-  // public send(op: "USER_INFO"): Promise<DataUser>;
 
   public send(op: string, d: any = null): Promise<any> {
     return new Promise((resolve) => {

@@ -28,16 +28,13 @@ export default class IntraAPI {
    */
   public async fetchUserCookie(cookieName: string) {
     await new Promise((resolve, reject) => {
-      chrome.cookies.get(
-        { url: "https://intra.epitech.eu/", name: cookieName },
-        (cookie) => {
-          if (cookie) {
-            resolve(cookie);
-          } else {
-            reject(new Error(`Cookie '${cookieName}' not found`));
-          }
+      chrome.cookies.get({ url: "https://intra.epitech.eu/", name: cookieName }, (cookie) => {
+        if (cookie) {
+          resolve(cookie);
+        } else {
+          reject(new Error(`Cookie '${cookieName}' not found`));
         }
-      );
+      });
     }).then((cookie: chrome.cookies.Cookie) => {
       this._userCookie = cookie.value;
     });
@@ -57,7 +54,7 @@ export default class IntraAPI {
   public async fetch(url: string, warn = true): Promise<any> | null {
     let headers: any = {
       Accept: "application/json",
-    }
+    };
     if (this._userCookie !== undefined) {
       headers.Cookie = `user=${this._userCookie}`;
     }
@@ -67,11 +64,7 @@ export default class IntraAPI {
 
     if (response.ok === false) {
       if (warn == true) {
-        console.log(
-          "Error fetching data:",
-          response.status,
-          response.statusText
-        );
+        console.log("Error fetching data:", response.status, response.statusText);
       }
       return null;
     }

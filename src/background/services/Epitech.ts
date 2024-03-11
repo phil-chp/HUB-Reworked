@@ -5,7 +5,6 @@ import User from "@shared/types/User";
 import HubActivity from "@shared/types/HubActivity";
 import HubActivityFactory from "@shared/types/HubActivityFactory";
 import RawHubActivity from "@shared/types/RawHubActivity";
-import ScrapperMeetup from "@background/scrapper/ScrapperMeetup";
 
 const LIMIT = pLimit(20);
 
@@ -13,7 +12,6 @@ export default class Epitech {
   private _LS: chrome.storage.LocalStorageArea;
 
   private _userInfo: User;
-  private _scrapperMeetup: ScrapperMeetup;
   private _hubActivities: HubActivity[];
 
   constructor() {
@@ -32,8 +30,6 @@ export default class Epitech {
    */
   public async init(): Promise<void> {
     this._userInfo = await this._fetchUserInfo();
-    this._scrapperMeetup = new ScrapperMeetup(this._userInfo.city, this._userInfo.country);
-    this._scrapperMeetup.init();
   }
 
   /**
@@ -42,10 +38,6 @@ export default class Epitech {
    */
   public getUserInfo(): User {
     return this._userInfo;
-  }
-
-  public scrapeEvents(n: number) {
-    return this._scrapperMeetup.getLatestEvents(n);
   }
 
   public resetEvents() {
@@ -70,8 +62,6 @@ export default class Epitech {
     //   return (res.exipresIn !== undefined && res.exipresIn > Date.now());
     // });
 
-    // this._userInfo.year = "2022"; // FIXME: REMOVE
-    // this._userInfo.city = "NCE";  // FIXME: REMOVE
     const { year, country, city } = this._userInfo;
 
     await this._fetchHubRegionalActivities(year, city);
@@ -91,8 +81,6 @@ export default class Epitech {
   // *----------------------------------------------------------------------* //
 
   private async _updateActivitiesHash(activities: HubActivity[]) {
-    console.log("Updating hash map with: ", activities);
-
     const { hubActivitiesHash } = await this._LS.get("hubActivitiesHash");
     const hubActivitiesRecord: Record<string, HubActivity> = hubActivitiesHash || {};
 
@@ -103,7 +91,6 @@ export default class Epitech {
         (savedActivity.type === "Project" || savedActivity.type === "Experience") &&
         savedActivity.xp !== 0
       ) {
-        console.log("Saving XP", activity.codeacti, savedActivity);
         hubActivitiesRecord[activity.codeacti] = activity;
         hubActivitiesRecord[activity.codeacti].xp = savedActivity.xp;
       } else {
@@ -163,7 +150,7 @@ export default class Epitech {
     const response = await IntraAPI.getInstance().fetch(`module/${year}/B-INN-000/${region}-0-1`);
 
     if (response === null) return;
-    const activities: RawHubActivity[] = response.activites; //.slice(200, 500);
+    const activities: RawHubActivity[] = response.activites;
 
     const activityPromises = activities.map((activity) => {
       return LIMIT(async () => {

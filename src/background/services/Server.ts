@@ -1,9 +1,6 @@
 import DataHubActivities from "@shared/types/DataHubActivities";
 import Epitech from "@background/services/Epitech";
-import HUBEvents from "@shared/types/HUBEvents";
 import DataEmptyReply from "@shared/types/DataEmptyReply";
-import generateIdeas from "./GPT";
-import DataIdeas from "@shared/types/Idea";
 
 class Server {
   // *----------------------------------------------------------------------* //
@@ -50,15 +47,15 @@ class Server {
         });
       }
 
-      console.log("Received message:", data);
+      // console.log("Received message:", data);
       switch (data.op) {
         case "TEST":
-          console.log("    Test");
+          // console.log("    Test");
           return respond(null);
 
         case "GET_XP":
           const activities = await this._epi.fetchHubActivities();
-          console.log("    Activities:", activities);
+          // console.log("    Activities:", activities);
           return respond({
             d: Date.now(),
             activities,
@@ -66,41 +63,17 @@ class Server {
 
         case "UPDATE_XP":
           this._epi.updateHubActivities(data.d);
-          console.log("    Updated XP");
+          // console.log("    Updated XP");
           return respond({
             d: Date.now(),
           } as DataEmptyReply);
 
-        case "EVENTS":
-          const events = await this._epi.scrapeEvents(20);
-          console.log("    Events:", events);
-          return respond({
-            d: Date.now(),
-            events,
-          } as HUBEvents); // TODO: Rename HUBEvents to DataHUBEvents for consistency or vice-versa
-
         case "RESET_XP":
           await this._epi.resetEvents();
-          console.log("    Reset events cache");
-          return respond({
-            d: Date.now()
-          }); // TODO: Rename HUBEvents to DataHUBEvents for consistency or vice-versa
-
-        case "GENERATE_IDEAS":
-          const response = await generateIdeas(data.d)
-          console.log("    Generated ideas:", response);
+          // console.log("    Reset events cache");
           return respond({
             d: Date.now(),
-            ideas: response,
-          } as DataIdeas);
-
-        // case "USER_INFO":
-        //   const user = this._epi.getUserInfo();
-        //   console.log("    User info:", user);
-        //   return respond({
-        //     d: Date.now(),
-        //     user,
-        //   } as DataUser);
+          }); // TODO: Rename HUBEvents to DataHUBEvents for consistency or vice-versa
       }
     });
   }

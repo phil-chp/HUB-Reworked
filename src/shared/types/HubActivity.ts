@@ -1,12 +1,7 @@
 import User from "@shared/types/User";
 import RawHubActivity from "@shared/types/RawHubActivity";
 
-type HubActivityType =
-  | "Talk"
-  | "Workshop"
-  | "Hackathon"
-  | "Experience"
-  | "Project";
+type HubActivityType = "Talk" | "Workshop" | "Hackathon" | "Experience" | "Project";
 
 abstract class HubActivity {
   abstract type: HubActivityType;

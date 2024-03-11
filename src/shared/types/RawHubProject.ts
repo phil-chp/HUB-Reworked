@@ -11,12 +11,10 @@ export interface RawHubProjectRegistered {
   members: RawHubProjectMember[];
 }
 
-
 export interface RawHubProjectMaster {
   login: string;
   status: string;
 }
-
 
 export interface RawHubProjectMember {
   login: string;

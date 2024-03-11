@@ -1,16 +1,15 @@
 import User from "@shared/types/User";
 import HubActivity from "@shared/types/HubActivity";
 import RawHubActivity from "@shared/types/RawHubActivity";
-import {
-  HubTalk,
-  HubWorkshop,
-  HubHackathon,
-  HubExperience,
-  HubProject,
-} from "@shared/types/hubActivities";
+import { HubTalk, HubWorkshop, HubHackathon, HubExperience, HubProject } from "@shared/types/hubActivities";
 
 export default class HubActivityFactory {
-  static createActivity(type: string, data: RawHubActivity, userData: User = null, region: string = null): HubActivity | null {
+  static createActivity(
+    type: string,
+    data: RawHubActivity,
+    userData: User = null,
+    region: string = null
+  ): HubActivity | null {
     switch (type) {
       case "Talk":
         return new HubTalk(data);

@@ -6,7 +6,6 @@ export default class HubHackathon extends HubActivity {
 
   constructor(data: RawHubActivity) {
     super(data);
-
   }
 
   // *----------------------------------------------------------------------* //
@@ -15,11 +14,11 @@ export default class HubHackathon extends HubActivity {
 
   public override init(): Promise<boolean> {
     if (this._calculateParticipation(this._events) === false) {
-      return new Promise(resolve => resolve(false));
+      return new Promise((resolve) => resolve(false));
     }
     this.xp = this._calculateXP();
     this.to_come = this._determineIfToCome(this._end);
-    return new Promise(resolve => resolve(true));
+    return new Promise((resolve) => resolve(true));
   }
 
   // *----------------------------------------------------------------------* //

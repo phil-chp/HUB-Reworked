@@ -17,8 +17,8 @@ import { defineProps } from "vue";
 const props = defineProps({
   hintMessage: {
     type: String,
-    default: "Error."
-  }
+    default: "Error.",
+  },
 });
 </script>
 
@@ -54,4 +54,5 @@ const props = defineProps({
 .error-hint:hover .error-hint-text {
   visibility: visible;
   opacity: 1;
-}</style>
+}
+</style>
