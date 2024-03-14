@@ -29,7 +29,7 @@ export default class HubExperience extends HubActivity {
   // *----------------------------------------------------------------------* //
 
   protected override _calculateXP(): number {
-    return this.presences * 3;
+    return (this.presences && 1) * 3;
   }
 
   private async _verifyPresence(login: string, year: string, region: string): Promise<boolean> {

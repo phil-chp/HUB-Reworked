@@ -26,6 +26,6 @@ export default class HubTalk extends HubActivity {
   // *----------------------------------------------------------------------* //
 
   protected override _calculateXP(): number {
-    return this.presences * 1 + this.absences * -1;
+    return (this.presences && 1) * 1 + (this.absences && 1) * -1;
   }
 }

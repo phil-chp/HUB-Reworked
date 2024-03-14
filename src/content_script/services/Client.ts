@@ -4,12 +4,37 @@ import { mySleep } from "@content_script/services/utils";
 
 class Client {
   private _socket: chrome.runtime.Port;
+  private _attemptedReconnect: number;
 
   constructor() {
-    this._socket = chrome.runtime.connect();
+    this._attemptedReconnect = 5;
+  }
+
+  public connect(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (this._attemptedReconnect <= 0) {
+        return reject(new Error("Failed to connect."));
+      }
+      this._socket = chrome.runtime.connect();
+      const handler = () => {
+        --this._attemptedReconnect;
+        console.log("Failed to connect. Retrying in 500ms...", this._attemptedReconnect, "attempts left.")
+        mySleep(500).then(() => this.connect().then(resolve).catch(reject));
+      };
+
+      this._socket.onDisconnect.addListener(handler);
+      this.send("TEST").then(() => {
+        this._socket.onDisconnect.removeListener(handler);
+        resolve();
+      });
+    });
   }
 
   public async fetchData(op: any, maxAttempts = 5): Promise<any> {
+    if (this._socket === undefined) {
+      throw new Error("Call connect() first.");
+    }
+
     let attemptsLeft = maxAttempts;
     while (true) {
       try {

@@ -69,6 +69,7 @@ const status = ref(Status.NONE);
 const popupStatus = ref(false);
 
 onMounted(async () => {
+  await client.connect();
   const res = await client.fetchData("GET_XP").catch(() => {
     xp_hint.value = "Error.";
     status.value = Status.ERROR;

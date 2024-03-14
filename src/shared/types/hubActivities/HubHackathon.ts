@@ -26,6 +26,6 @@ export default class HubHackathon extends HubActivity {
   // *----------------------------------------------------------------------* //
 
   protected override _calculateXP(): number {
-    return this.presences * 6 + this.absences * -6;
+    return (this.presences && 1) * 6 + (this.absences && 1) * -6;
   }
 }
