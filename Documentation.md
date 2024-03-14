@@ -47,14 +47,6 @@ If you wish to get more information, please click on the icon, this will open a 
 
 <img src="assets/doc/interact-xp.jpg" alt="User section on the intra" width="300px" />
 
-### Hub Event suggestions
-
-As an extra feature, Hub Reworked will suggest you some events you can do to gain more XP, these events are usually Talks or Workshops, around your city. This is determined via the location information of your campus.
-
-Click on the blue info icon to see the events.
-
-<img src="assets/doc/interact-events.jpg" alt="User section on the intra" width="300px" />
-
 ## Legacy code
 
 This used to be a HUB Project, to be able to validate the maximum amount of XPs I added extra features in relation with the HUB, though I do not find them to be that useful nor did I polish them.
