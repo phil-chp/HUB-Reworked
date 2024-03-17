@@ -10,7 +10,7 @@ class Client {
     this._attemptedReconnect = 5;
   }
 
-  public connect(): Promise<void> {
+  public connect(timeout = 500): Promise<void> {
     return new Promise((resolve, reject) => {
       if (this._attemptedReconnect <= 0) {
         return reject(new Error("Failed to connect."));
@@ -18,8 +18,8 @@ class Client {
       this._socket = chrome.runtime.connect();
       const handler = () => {
         --this._attemptedReconnect;
-        console.log("Failed to connect. Retrying in 500ms...", this._attemptedReconnect, "attempts left.")
-        mySleep(500).then(() => this.connect().then(resolve).catch(reject));
+        console.log(`Failed to connect. Retrying in ${timeout}ms... (${this._attemptedReconnect + 1} attempts left.)`)
+        mySleep(timeout).then(() => this.connect(timeout * 2).then(resolve).catch(reject));
       };
 
       this._socket.onDisconnect.addListener(handler);

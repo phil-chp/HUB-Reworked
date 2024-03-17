@@ -31,6 +31,7 @@ const props = defineProps({
 }
 
 .error-hint {
+  display: flex;
   position: relative;
 }
 

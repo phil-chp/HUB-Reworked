@@ -18,11 +18,7 @@
     <div class="popup-details-anchor" v-if="popupStatus">
       <div
         class="popup-details-wrapper"
-        @click="
-          () => {
-            popupStatus = false;
-          }
-        "
+        @click="() => { popupStatus = false }"
       >
         <table class="popup-details" @click.stop>
           <thead>
@@ -41,6 +37,22 @@
               <td >{{ event.orgAbsences == 0 ? event.absences : event.orgAbsences }}</td>
             </tr>
           </tbody>
+          <table class="popup-report" @click.stop>
+            <thead>
+              <tr>
+                <th>Activity</th>
+                <th>Participated</th>
+                <th>Organized</th>
+              </tr>
+            </thead>
+            <tbody class="row" v-for="(value, key, index) in activityTypes" :key="index" onerror="this.style.display='none'">
+              <tr>
+                <td>{{ key }}</td>
+                <td>{{ value[0] || 0 }}&nbsp;/&nbsp;{{ maxActivityTypes[key][0] || "∞" }}</td>
+                <td>{{ value[1] || 0 }}&nbsp;/&nbsp;{{ maxActivityTypes[key][1] || "∞" }}</td>
+              </tr>
+            </tbody>
+          </table>
 
           <div class="hub-legend">
             <div class="organized-legend"></div><div>Activity you organized</div>
@@ -49,6 +61,7 @@
           <div class="hub-reset">
             <a @click="resetStats()">Reset all XP info?</a>
           </div>
+
         </table>
       </div>
     </div>
@@ -69,6 +82,15 @@ let client = new Client();
 const xp = ref(-1);
 const xp_hint = ref("Loading...");
 const activities = ref([] as HubActivity[]);
+const activityTypes = ref({} as { string?: number[] });
+const maxActivityTypes = {
+              // part orga   // Sorry for this mess, I just want to get it work and don't really have the time. By the way, I've tried to setup children components for the tables as it's getting messy, but it doesn't work, so once again, I don't have the time right now
+  "Talk":       [15,  6],
+  "Workshop":   [10,  3],
+  "Hackathon":  [0,   0],
+  "Experience": [8,   0],
+  "Project":    [0,   0],
+};
 
 const needUserInput = ref([] as HubActivity[]);
 const status = ref(Status.NONE);
@@ -76,7 +98,11 @@ const status = ref(Status.NONE);
 const popupStatus = ref(false);
 
 onMounted(async () => {
-  await client.connect();
+  await client.connect().catch(() => {
+    console.log("An error occured while connecting to the background script. Please try reloading the page.")
+    xp_hint.value = "Error.";
+    status.value = Status.ERROR;
+  });
   const res = await client.fetchData("GET_XP").catch(() => {
     xp_hint.value = "Error.";
     status.value = Status.ERROR;
@@ -86,6 +112,7 @@ onMounted(async () => {
   if (res.activities?.length > 0) {
     activities.value = res.activities;
     xp.value = calculateXP(res.activities);
+    activitiesReport();
     const needInput = await needUserInput.value;
     if (needInput.length > 0) {
       status.value = Status.NEED_USER_INPUT;
@@ -157,6 +184,20 @@ function resetStats() {
   popupStatus.value = false;
   location.reload();
 }
+
+function activitiesReport() {
+  for (const activity of activities.value) {
+    const n = activity.orgPresences + activity.orgAbsences > 0 ? 1 : 0;
+    if (activityTypes.value[activity.type]) {
+      activityTypes.value[activity.type][n] += 1;
+    } else {
+      activityTypes.value[activity.type] = [];
+      activityTypes.value[activity.type][n] = 1;
+      activityTypes.value[activity.type][!n] = 0;
+    }
+  }
+  return activityTypes;
+}
 </script>
 
 <style scoped>
@@ -186,25 +227,35 @@ function resetStats() {
   z-index: 2147483646;
 }
 
-.popup-details {
+.popup-details,
+.popup-report {
   position: relative;
   background-color: #fff;
-  padding: 20px;
+  padding: 10px;
   border-radius: 10px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   max-height: 80%;
-  max-width: 80%;
-  width: 100%; /* ? */
+  max-width: 60%;
+  width: 100%;
   margin-bottom: 10px;
   overflow-y: auto;
   z-index: 2147483647;
 }
 
-.popup-details thead {
+.popup-report {
+  margin: 32px 0;
+  padding: 5px;
+  width: 40%;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+}
+
+.popup-details thead,
+.popup-report thead {
   background-color: #f5f5f5;
 }
 
-.popup-details tr {
+.popup-details tr,
+.popup-report tr {
   border-bottom: 1px solid #ddd;
 }
 
@@ -218,7 +269,7 @@ function resetStats() {
 .popup-details .hub-reset {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   margin-top: 16px;
 }
 
@@ -234,21 +285,26 @@ function resetStats() {
   margin: 0 5px;
 }
 
-.popup-details tr:last-child {
+.popup-details tr:last-child,
+.popup-report tr:last-child {
   border-bottom: none;
 }
 
-.popup-details td {
+.popup-details td,
+.popup-report td {
   padding: 10px 0;
   text-align: center;
 }
 
 .popup-details th:first-child,
-.popup-details td:first-child {
+.popup-details td:first-child,
+.popup-report th:first-child,
+.popup-report td:first-child {
   text-align: left;
 }
 
-.popup-details tbody tr:hover {
+.popup-details tbody tr:hover,
+.popup-report tbody tr:hover {
   background-color: #f5f5f5;
 }
 </style>
