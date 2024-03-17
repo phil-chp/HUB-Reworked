@@ -70,4 +70,21 @@ export default class IntraAPI {
     }
     return response.json();
   }
+
+  public async fetchThrow(url: string): Promise<any> | null {
+    let headers: any = {
+      Accept: "application/json",
+    };
+    try {
+      const response = await fetch(API_PATH + url + API_SUFFIX, {
+        headers: headers,
+      });
+      if (response.ok === false) {
+        return response;
+      }
+      return response.json();
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 }

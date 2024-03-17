@@ -1,4 +1,3 @@
-import IntraAPI from "@shared/services/IntraAPI";
 import User from "@shared/types/User";
 import HubActivity from "@shared/types/HubActivity";
 import RawHubActivity from "@shared/types/RawHubActivity";
@@ -19,7 +18,7 @@ export default class HubExperience extends HubActivity {
     if ((await this._verifyPresence(this._userData.login, this._userData.year, this._region)) === false) {
       return new Promise((resolve) => resolve(false));
     }
-    this.xp = this._calculateXP();
+    this.xp = this._calculateXP(3);
     this.to_come = this._determineIfToCome(this._end);
     return new Promise((resolve) => resolve(true));
   }
@@ -28,14 +27,10 @@ export default class HubExperience extends HubActivity {
   // *                                Private                               * //
   // *----------------------------------------------------------------------* //
 
-  protected override _calculateXP(): number {
-    return (this.presences && 1) * 3;
-  }
-
   private async _verifyPresence(login: string, year: string, region: string): Promise<boolean> {
-    const grades: HubActivityGrade[] = await IntraAPI.getInstance().fetch(
-      `module/${year}/B-INN-000/${region}-0-1/${this.codeacti}/note`
-    );
+    const url = `module/${year}/B-INN-000/${region}-0-1/${this.codeacti}/note`;
+    const grades: HubActivityGrade[] = await this._fetchActivity(url);
+
     if (!Array.isArray(grades) || grades.length === 0) return false;
     const userGrade = grades.find((grade) => grade.login === login);
 

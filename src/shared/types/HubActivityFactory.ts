@@ -12,11 +12,11 @@ export default class HubActivityFactory {
   ): HubActivity | null {
     switch (type) {
       case "Talk":
-        return new HubTalk(data);
+        return new HubTalk(data, userData);
       case "Workshop":
-        return new HubWorkshop(data);
+        return new HubWorkshop(data, userData);
       case "Hackathon":
-        return new HubHackathon(data);
+        return new HubHackathon(data, userData);
       case "Experience":
         return new HubExperience(data, userData, region);
       case "Project":

@@ -1,11 +1,12 @@
 import HubActivity from "@shared/types/HubActivity";
 import RawHubActivity from "@shared/types/RawHubActivity";
+import User from "@shared/types/User";
 
 export default class HubTalk extends HubActivity {
   type: "Talk" = "Talk";
 
-  constructor(data: RawHubActivity) {
-    super(data);
+  constructor(data: RawHubActivity, userData: User = null) {
+    super(data, userData);
   }
 
   // *----------------------------------------------------------------------* //
@@ -16,16 +17,8 @@ export default class HubTalk extends HubActivity {
     if (this._calculateParticipation(this._events) === false) {
       return new Promise((resolve) => resolve(false));
     }
-    this.xp = this._calculateXP();
+    this.xp = this._calculateXP(1, -1, 4, -6);
     this.to_come = this._determineIfToCome(this._end);
     return new Promise((resolve) => resolve(true));
-  }
-
-  // *----------------------------------------------------------------------* //
-  // *                                Private                               * //
-  // *----------------------------------------------------------------------* //
-
-  protected override _calculateXP(): number {
-    return (this.presences && 1) * 1 + (this.absences && 1) * -1;
   }
 }

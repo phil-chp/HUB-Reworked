@@ -6,7 +6,7 @@ import HubActivity from "@shared/types/HubActivity";
 import HubActivityFactory from "@shared/types/HubActivityFactory";
 import RawHubActivity from "@shared/types/RawHubActivity";
 
-const LIMIT = pLimit(20);
+const LIMIT = pLimit(5);
 
 export default class Epitech {
   private _LS: chrome.storage.LocalStorageArea;
@@ -62,10 +62,12 @@ export default class Epitech {
     //   return (res.exipresIn !== undefined && res.exipresIn > Date.now());
     // });
 
+    // this._userInfo.year = "2022"; // FIXME: REMOVE
+    // this._userInfo.city = "NCE";  // FIXME: REMOVE
     const { year, country, city } = this._userInfo;
 
     await this._fetchHubRegionalActivities(year, city);
-    await this._fetchHubRegionalActivities(year, country);
+    // await this._fetchHubRegionalActivities(year, country);
     await this._updateActivitiesHash(this._hubActivities);
 
     // this._LS.set({ exipresIn: Date.now() + 1000 * 60 * 60 * 24 }); // TODO: Beta test this timer
@@ -156,6 +158,7 @@ export default class Epitech {
       return LIMIT(async () => {
         const hubActivity = HubActivityFactory.createActivity(activity.type_title, activity, this._userInfo, region);
         if (hubActivity !== null) {
+          await setTimeout(() => {}, 3000 * Math.random());
           return (await hubActivity.init()) ? hubActivity : null;
         }
         return null;
