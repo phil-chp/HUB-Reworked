@@ -34,14 +34,21 @@
             </tr>
           </thead>
           <tbody class="row" v-for="(event, index) in activities" :key="index" onerror="this.style.display='none'">
-            <tr>
+            <tr :class="{ 'organized': event.orgAbsences != 0 || event.orgPresences != 0 }">
               <td>{{ event.title }}</td>
               <td>{{ event.xp / (event.members || 1) }}</td>
-              <td>{{ event.presences }}</td>
-              <td>{{ event.absences }}</td>
+              <td >{{ event.orgPresences == 0 ? event.presences : event.orgPresences }}</td>
+              <td >{{ event.orgAbsences == 0 ? event.absences : event.orgAbsences }}</td>
             </tr>
           </tbody>
-          <a @click="resetStats()">Reset all XP info?</a>
+
+          <div class="hub-legend">
+            <div class="organized-legend"></div><div>Activity you organized</div>
+          </div>
+
+          <div class="hub-reset">
+            <a @click="resetStats()">Reset all XP info?</a>
+          </div>
         </table>
       </div>
     </div>
@@ -199,6 +206,32 @@ function resetStats() {
 
 .popup-details tr {
   border-bottom: 1px solid #ddd;
+}
+
+.popup-details .hub-legend {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.popup-details .hub-reset {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.popup-details .hub-reset > a {
+  cursor: pointer;
+}
+
+.popup-details .organized-legend::after,
+.popup-details tr.organized > td:nth-child(1)::after {
+  content: "*";
+  color: red;
+  font-size: 1.5em;
+  margin: 0 5px;
 }
 
 .popup-details tr:last-child {

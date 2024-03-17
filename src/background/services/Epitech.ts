@@ -62,12 +62,12 @@ export default class Epitech {
     //   return (res.exipresIn !== undefined && res.exipresIn > Date.now());
     // });
 
-    // this._userInfo.year = "2022"; // FIXME: REMOVE
-    // this._userInfo.city = "NCE";  // FIXME: REMOVE
+    // this._userInfo.year = "2022";
+    // this._userInfo.city = "NCE";
     const { year, country, city } = this._userInfo;
 
     await this._fetchHubRegionalActivities(year, city);
-    // await this._fetchHubRegionalActivities(year, country);
+    await this._fetchHubRegionalActivities(year, country);
     await this._updateActivitiesHash(this._hubActivities);
 
     // this._LS.set({ exipresIn: Date.now() + 1000 * 60 * 60 * 24 }); // TODO: Beta test this timer
@@ -167,7 +167,9 @@ export default class Epitech {
 
     await Promise.all(activityPromises).then((activities) => {
       const validActivities = activities.filter(
-        (activity) => activity !== null && (activity.presences > 0 || activity.absences > 0)
+        (activity) =>
+          activity !== null &&
+          (activity.presences > 0 || activity.absences > 0 || activity.orgPresences > 0 || activity.orgAbsences > 0)
       );
       this._hubActivities.push(...validActivities);
     });
