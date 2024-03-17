@@ -6,6 +6,7 @@ A simple tool to calculate the amount of XP you currently have to validate your 
 
 Hub Reworked works for the Bachelor's as well as for the Master's degree (European campuses).
 </br></br></br>
+
 ## Documentation
 
 Go to [Documentation](./Documentation.md) for more information.
