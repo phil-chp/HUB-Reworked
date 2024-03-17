@@ -90,7 +90,7 @@ const maxActivityTypes = {
   "Hackathon":  [0,   0],
   "Experience": [8,   0],
   "Project":    [0,   0],
-};
+} as { string?: number[] };
 
 const needUserInput = ref([] as HubActivity[]);
 const status = ref(Status.NONE);
