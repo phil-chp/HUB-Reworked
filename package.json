@@ -1,6 +1,6 @@
 {
   "name": "hub-reworked",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Simple XP calculator for your Epitech Hub activities.",
   "main": "index.js",
   "author": "Philippe Cheype",
